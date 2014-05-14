@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>WindowsAzure.MobileServices.Backend.Tables</id>
+    <version>1.0.258</version>
+    <title>Windows Azure Mobile Services .NET Backend Tables</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkID=331327</licenseUrl>
+    <projectUrl>https://github.com/WindowsAzure/azure-mobile-services</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>This package contains common infrastructure needed when exposing structured storage as part of your .NET mobile backend hosted in Windows Azure. For more information, check out https://www.windowsazure.com/mobile</description>
+    <releaseNotes />
+    <copyright>© Microsoft Corporation. All rights reserved</copyright>
+    <tags>microsoft windows azure mobile services backend windowsazureofficial aspnet webapi aspnetwebapi owin</tags>
+    <dependencies>
+      <dependency id="WindowsAzure.MobileServices.Backend" version="1.0.258" />
+      <dependency id="Autofac" version="3.3.0" />
+      <dependency id="Microsoft.AspNet.WebApi.OData" version="5.1.1" />
+      <dependency id="Microsoft.AspNet.WebApi.Tracing" version="5.1.1" />
+      <dependency id="Microsoft.Owin.Security.OAuth" version="2.1.0" />
+    </dependencies>
+  </metadata>
+</package>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>WindowsAzure.MobileServices.Backend</id>
+    <version>1.0.258</version>
+    <title>Windows Azure Mobile Services .NET Backend</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkID=331327</licenseUrl>
+    <projectUrl>https://github.com/WindowsAzure/azure-mobile-services</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>This library enables you to develop scalable and secure .NET mobile backends hosted in Windows Azure. You can incorporate structured storage, user authentication and push notifications in minutes. For more information, check out https://www.windowsazure.com/mobile</description>
+    <releaseNotes />
+    <copyright>© Microsoft Corporation. All rights reserved</copyright>
+    <tags>microsoft windows azure mobile services backend windowsazureofficial aspnet webapi aspnetwebapi owin</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="6.0.1" />
+      <dependency id="Autofac" version="3.3.0" />
+      <dependency id="Microsoft.AspNet.Identity.Owin" version="2.0.0" />
+      <dependency id="Microsoft.AspNet.WebApi.Owin" version="5.1.1" />
+      <dependency id="Microsoft.AspNet.WebApi.Tracing" version="5.1.1" />
+      <dependency id="Microsoft.Owin.Security.ActiveDirectory" version="2.1.0" />
+      <dependency id="Microsoft.Owin.Security.Facebook" version="2.1.0" />
+      <dependency id="Microsoft.Owin.Security.Google" version="2.1.0" />
+      <dependency id="Microsoft.Owin.Security.MicrosoftAccount" version="2.1.0" />
+      <dependency id="Microsoft.Owin.Security.Twitter" version="2.1.0" />
+      <dependency id="RazorEngine" version="3.4.1" />
+      <dependency id="WindowsAzure.ServiceBus" version="2.2.6.0" />
+    </dependencies>
+  </metadata>
+</package>

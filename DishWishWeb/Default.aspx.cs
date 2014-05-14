@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using DishWishWeb.Models;
 
 namespace DishWishWeb
 {
@@ -11,7 +12,8 @@ namespace DishWishWeb
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            Base b = new Base();
+            b.Get();
         }
     }
 }
