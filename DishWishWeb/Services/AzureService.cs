@@ -12,8 +12,6 @@ namespace DishWishWeb.Services
 {
     public class AzureService
     {
-        
-
         HttpClient client;
 
         string key = "ttjXxmFBCjMSMnxYlgutYahHQHOMXB15";
