@@ -5,17 +5,18 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace DishWish.App_Code
+namespace DishWishWeb.Services
 {
     public class BlobService
     {
         CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
-        private readonly string placesContainer = "places";
+        string _containerName;
 
-        public BlobService()
+        public BlobService(string containerName)
         {
-
+            _containerName = containerName;
         }
+
 
         public void CreateBlob(string blobName)
         {
@@ -25,7 +26,7 @@ namespace DishWish.App_Code
                 CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
                 // Retrieve a reference to a container. 
-                CloudBlobContainer container = blobClient.GetContainerReference(placesContainer);
+                CloudBlobContainer container = blobClient.GetContainerReference(_containerName);
 
                 // Retrieve reference to a blob named "myblob".
                 CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
@@ -41,6 +42,21 @@ namespace DishWish.App_Code
             {
                 string exc = ex.ToString();
             }
+        }
+
+        public void DeleteBlob(string blobName)
+        {
+            // Create the blob client.
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+            // Retrieve reference to a previously created container.
+            CloudBlobContainer container = blobClient.GetContainerReference(_containerName);
+
+            // Retrieve reference to a blob named "myblob.txt".
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
+
+            // Delete the blob.
+            blockBlob.Delete();
         }
     }
 }

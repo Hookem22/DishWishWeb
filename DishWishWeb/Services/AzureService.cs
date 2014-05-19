@@ -6,67 +6,63 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
 using System.Web.Http;
-using Newtonsoft.Json;
 
 namespace DishWishWeb.Services
 {
     public class AzureService
     {
         HttpClient client;
-
         string key = "ttjXxmFBCjMSMnxYlgutYahHQHOMXB15";
-        public AzureService()
+        string _tableName;
+        public AzureService(string tableName)
         {
             client = new HttpClient();
             client.DefaultRequestHeaders.Add("X-ZUMO-APPLICATION",key);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        }
- 
-        public IEnumerable<string> Get()
-        {
-            var data = client.GetStringAsync("https://dishwishes.azure-mobile.net/tables/Place").Result;
-            var teams = JsonConvert.DeserializeObject<IEnumerable<string>>(data);
-            return teams;
-        }
- 
-        public string Get(int id)
-        {
-            var data = client.GetStringAsync("https://dishwishes.azure-mobile.net/tables/Place?$filter=Id eq " + id).Result;
-            var team = JsonConvert.DeserializeObject<IEnumerable<string>>(data);
-            return team.ToString(); //.FirstOrDefault();
-        }
- 
-        public void Post(string team)
-        {
 
-            var obj = JsonConvert.SerializeObject(team, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://dishwishes.azure-mobile.net/tables/Place");
+            _tableName = tableName;
+        }
+
+        public string Get(string id)
+        {
+            return client.GetStringAsync(string.Format("https://dishwishes.azure-mobile.net/tables/{0}/{1}", _tableName, id)).Result;
+
+            //Get by Name
+            //client.GetStringAsync(string.Format("https://dishwishes.azure-mobile.net/tables/{0}?$filter=Name eq {1}", _tableName, name)).Result;
+        }
+
+        public string Get()
+        {
+           return client.GetStringAsync(string.Format("https://dishwishes.azure-mobile.net/tables/{0}", _tableName)).Result;
+        }
+
+        public string Post(dynamic obj)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, string.Format("https://dishwishes.azure-mobile.net/tables/{0}", _tableName));
             request.Content = new StringContent(obj, Encoding.UTF8, "application/json");
  
             var data = client.SendAsync(request).Result;
- 
+
             if (!data.IsSuccessStatusCode)
                 throw new HttpResponseException(data.StatusCode);
-            
-            //throw new HttpResponseException(HttpStatusCode.BadRequest);
+
+            string idString = data.Headers.Location.AbsoluteUri;
+            return idString.Substring(idString.LastIndexOf("/") + 1);
         }
  
-        public void Put(string team)
+         
+        public void Put(string id, dynamic obj)
         {
-
-            var request = new HttpRequestMessage(new HttpMethod("PATCH"), "https://dishwishes.azure-mobile.net/tables/Place/" + team);
-            var obj = JsonConvert.SerializeObject(team);
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), string.Format("https://dishwishes.azure-mobile.net/tables/{0}/{1}", _tableName, id));
             request.Content = new StringContent(obj, Encoding.UTF8, "application/json");
  
             var data = client.SendAsync(request).Result;
                 
             if (!data.IsSuccessStatusCode)
                 throw new HttpResponseException(data.StatusCode);
- 
-            //throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
- 
-        public void Delete(int id)
+
+        public void Delete(string id)
         {
             var request = new HttpRequestMessage(HttpMethod.Delete, "https://dishwishes.azure-mobile.net/tables/Place/" + id);
             var data = client.SendAsync(request).Result;
@@ -74,5 +70,6 @@ namespace DishWishWeb.Services
             if (!data.IsSuccessStatusCode)
                 throw new HttpResponseException(data.StatusCode);
         }
+ 
     }
 }
