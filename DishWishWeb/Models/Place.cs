@@ -27,6 +27,35 @@ namespace DishWishWeb.Models
             return GooglePlacesService.GoogleSearchCity(placeName, latitude, longitude);
         }
 
+        public static List<string> DownloadImages(List<string> urls)
+        {
+            ImageService service = new ImageService();
+            service.ClearTmpImages();
+
+            BlobService blob = new BlobService("places");
+            blob.ClearTmpBlobs();
+
+            List<string> blobUrls = new List<string>();
+            for(int i = 0; i < urls.Count; i++)
+            {
+                string tmpUrl = service.SaveTmpImage(urls[i], i.ToString());
+                blob.CreateBlob(tmpUrl);
+                blobUrls.Add(blob.container + tmpUrl);
+            }
+
+            return blobUrls;
+
+        }
+
+        public static void CropImage(string id, double percentCrop)
+        {
+            ImageService service = new ImageService();
+            service.Crop(id, percentCrop);
+
+            BlobService blob = new BlobService("places");
+            blob.CreateBlob("tmp_" + id);
+        }
+
         public static List<string> GoogleImages(string placeName, string city)
         {
             return GoogleImageService.GoogleImages(placeName, city);

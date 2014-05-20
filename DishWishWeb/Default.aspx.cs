@@ -13,40 +13,38 @@ namespace DishWishWeb
     {
         protected void Page_Load(object sender, EventArgs e)
         {           
-            
-            
-            //List<Place> p = Place.Get();
-            //Place p = new Place();
-            //p.Name = "Franklin's";
-            //p.Save();
 
-            //p.DeleteImages();
-            //Image2.ImageUrl = string.Format("http://dishwishes.blob.core.windows.net/places/{0}_2", p.Id);
         }
 
         [WebMethod]
         public static List<Place> SearchPlaces(string placeName, double latitude, double longitude)
         {
-            List<Place> places = Place.GoogleSearch(placeName, latitude.ToString(), longitude.ToString());
-
-            return places;
-
+            return Place.GoogleSearch(placeName, latitude.ToString(), longitude.ToString());
         }
 
         [WebMethod]
         public static List<string> GoogleImages(string placeName, string city)
         {
-            List<string> places = Place.GoogleImages(placeName, city);
-
-            return places;
-
+            return Place.GoogleImages(placeName, city);
         }
+
+        [WebMethod]
+        public static List<string> DownloadImages(List<string> urls)
+        {
+            return Place.DownloadImages(urls);
+        }
+
+        [WebMethod]
+        public static void CropImage(string id, double percentCrop)
+        {
+            Place.CropImage(id, percentCrop);
+        }
+
 
         [WebMethod]
         public static List<string> CityAutoComplete(string city)
         {
-            List<string> places = Place.GoogleAutoComplete(city);
-            return places;
+            return Place.GoogleAutoComplete(city);
         }
     }
 }

@@ -33,8 +33,6 @@ namespace DishWishWeb.Services
                 i++;
             }
 
-
-
             return images;
         }
     }

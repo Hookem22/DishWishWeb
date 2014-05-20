@@ -12,9 +12,12 @@ namespace DishWishWeb.Services
         CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
         string _containerName;
 
+        public string container;
+
         public BlobService(string containerName)
         {
             _containerName = containerName;
+            container = string.Format(@"http://dishwishes.blob.core.windows.net/{0}/", _containerName);
         }
 
 
@@ -55,8 +58,20 @@ namespace DishWishWeb.Services
             // Retrieve reference to a blob named "myblob.txt".
             CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
 
-            // Delete the blob.
-            blockBlob.Delete();
+            try
+            {
+                // Delete the blob.
+                blockBlob.Delete();
+            }
+            catch { }
+        }
+
+        public void ClearTmpBlobs()
+        {
+            for (int i = 0; i <= 10; i++)
+            {
+                DeleteBlob("tmp_" + i.ToString());
+            }
         }
     }
 }

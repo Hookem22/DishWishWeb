@@ -70,22 +70,22 @@ namespace DishWishWeb.Models
             service.Delete(this.Id);
         }
 
-        public void DeleteImages()
-        {
+        //public void DeleteImages()
+        //{
 
-            ImageService img = new ImageService();
-            img.Download("http://4.bp.blogspot.com/-UDnn6nWgXZE/UC0NhQuL29I/AAAAAAAAAwA/MBBXatFw0RM/s1600/8142012+002.jpg", Id);
+        //    ImageService img = new ImageService();
+        //    img.Download("http://4.bp.blogspot.com/-UDnn6nWgXZE/UC0NhQuL29I/AAAAAAAAAwA/MBBXatFw0RM/s1600/8142012+002.jpg", Id);
 
-            img.cropImage(Id, 100, 0);
+        //    img.cropImage(Id, 100, 0);
 
-            BlobService blob = new BlobService("places");
-            blob.CreateBlob(Id + "_2");
+        //    BlobService blob = new BlobService("places");
+        //    blob.CreateBlob(Id + "_2");
 
-            //img.Delete(Id);
+        //    //img.Delete(Id);
             
-            //BlobService blob = new BlobService("places");
-            //blob.DeleteBlob();
-        }
+        //    //BlobService blob = new BlobService("places");
+        //    //blob.DeleteBlob();
+        //}
        
     }
 }

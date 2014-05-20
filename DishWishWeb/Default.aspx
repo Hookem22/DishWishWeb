@@ -12,6 +12,7 @@
 <script type="text/javascript">
     var currentLat = 30.3077609;
     var currentLng = -97.7534014;
+    var imgWidth = 450;
 
     function SearchPlaces() {
 
@@ -101,7 +102,7 @@
     function PopulateImages(results) {
         var images = "";
         $(results).each(function () {
-            images += '<li><a><img src="' + this + '"/></a></li>';
+            images += '<li><div><img src="' + this + '" onclick="togglePickedImage(this)"/></div></li>';
         });
 
         $(".pickImages").html(images);
@@ -109,6 +110,67 @@
         $("#PopupOverlay").show();
         $("#Popup").show();
     }
+
+    function togglePickedImage(img) {
+        $(img).toggleClass("picked");
+    }
+
+    function AddImages() {
+
+        $("#PopupOverlay").hide();
+        $("#Popup").hide();
+
+
+        var urls = [];
+        $(".picked").each(function (i) {
+            urls.push($(this).attr("src"));
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "Default.aspx/DownloadImages",
+            data: "{urls:" + JSON.stringify(urls) + "}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+
+                var list = "<ul>";
+                $(data.d).each(function (i) {
+                    list += '<li><input id="Image' + i + 'Sort" type="text" style="width:50px;" value="' + i + '" /><br/><img src="' + this + '" style="width: ' + imgWidth + 'px;" /></li>';
+                });
+                list += "</ul>"
+
+                $("#imagesDiv").html(list);
+            }
+        });
+    }
+
+
+    $(document).bind('click', function () {
+        $('#imagesDiv li img').bind('click', function (e) {
+            var offset = $(this).offset();
+            var x = (e.pageX - offset.left);
+            var y = (e.pageY - offset.top);
+
+            var src = $(this).attr("src");
+            var id = src.substr(src.lastIndexOf("_") + 1);
+
+            var percentCrop = x / imgWidth;
+
+            $.ajax({
+                type: "POST",
+                url: "Default.aspx/CropImage",
+                data: "{id:'" + id + "', percentCrop:" + percentCrop + "}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    var thisImg = $("#imagesDiv img:eq(" + id + ")");
+                    console.log(thisImg);
+                    $(thisImg).attr("src", src + "?" + new Date().getTime());
+                }
+            });
+        });
+    });
 
     function CityAutoComplete() {
         var city = $("#CityTextbox").val();
@@ -160,7 +222,7 @@
             <ul class="pickImages">
 
             </ul>
-            <a class="button" style="position:fixed; right:5%;margin-right:80px;">Done</a>
+            <a class="button" style="position:fixed; right:5%;margin-right:80px;" onclick="AddImages();">Done</a>
             <a class="button" style="position:fixed; right:5%;" onclick="$('#PopupOverlay').hide();$('#Popup').hide();">Cancel</a>
         </div>
         <div class="search" >
@@ -181,11 +243,8 @@
         </div>
 
         <br />
-        <div id="images" style="display:none";>
-            <input id="Image1Sort" type="text" value="1" /><asp:Image ID="Image1" runat="server" Height="400px" />
-            <input id="Image2Sort" type="text" value="2" /><asp:Image ID="Image2" runat="server" Height="400px" />
-            <input id="Image3Sort" type="text" value="3" /><asp:Image ID="Image3" runat="server" Height="400px" />
-            <input id="Image4Sort" type="text" value="4" /><asp:Image ID="Image4" runat="server" Height="400px" />
+        <div id="imagesDiv" >
+
         </div>
     </div>
     </form>

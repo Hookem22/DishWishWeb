@@ -75,16 +75,26 @@ a.button:hover{
     float: left;
     margin: 5px;
 }
-.pickImages li img
+.pickImages li div
+{
+
+}
+.pickImages li div img
 {
     height: 250px;
+    border: 8px solid white;
+    border-radius: 4px;
+}
+.pickImages li div img.picked
+{
+    border: 8px solid green;
+    border-radius: 4px;
 }
 
 .search {
     float: left;
     width: 400px;
     display: inline-block;
-    position: fixed;
     padding: 7px 0 0 0; 
     z-index: 4000;
     margin-left: 55px;
@@ -152,7 +162,7 @@ a.button:hover{
     -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,0.44);
     box-shadow: 0 1px 4px 0 rgba(0,0,0,0.44);
     background: #fff;
-    left: 0;
+    left: 55px;
     right: 0;
 }
 .results {
@@ -178,4 +188,18 @@ a.button:hover{
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
    
+}
+
+#imagesDiv
+{
+    clear: both;
+}
+#imagesDiv li
+{
+    margin: 5px;
+    float: left;
+}
+#imagesDiv li img
+{
+    /*height: 250px;*/
 }
