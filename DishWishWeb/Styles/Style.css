@@ -37,7 +37,7 @@ input[type="text"]
     width: 95%;
     height: 90%;
     z-index: 999999999;
-    overflow: hidden;
+    overflow: auto;
     top: 5%;
     left: 2.5%;
     position: fixed;
@@ -70,9 +70,19 @@ a.button:hover{
     border: 1px solid #ccc;
 }
 
+.pickImages li
+{
+    float: left;
+    margin: 5px;
+}
+.pickImages li img
+{
+    height: 250px;
+}
+
 .search {
     float: left;
-    width: 300px;
+    width: 400px;
     display: inline-block;
     position: fixed;
     padding: 7px 0 0 0; 
@@ -101,7 +111,6 @@ a.button:hover{
     outline: none;
     padding: 6px 30px 6px 9px;
     position: relative;
-    width: 100%;
     z-index: 2002;
 }
 .searchButton {
@@ -132,7 +141,8 @@ a.button:hover{
     z-index: 2001;
     float:left;
     top: 9px;
-    
+    width: 299px;
+
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     -ms-border-radius: 3px;

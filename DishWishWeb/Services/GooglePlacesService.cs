@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Web;
 using DishWishWeb.Models;
 
@@ -17,7 +15,7 @@ namespace DishWishWeb.Services
 
         public static List<Place> GoogleSearchCity(string placeName, string latitude, string longitude)
         {
-            return GooglePlaceSearch(placeName, latitude, longitude, "30000", "&types=bakery|bar|cafe|food|night_club|restaurant", 5);
+            return GooglePlaceSearch(placeName, latitude, longitude, "30000", "&types=bakery|bar|cafe|food|night_club|restaurant", 6);
         }
 
         public static List<Place> GoogleSearchSpecific(string placeName, string latitude, string longitude)
@@ -31,7 +29,7 @@ namespace DishWishWeb.Services
 
             string url = string.Format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={0},{1}&radius={2}{3}&name={4}&sensor=false&key=AIzaSyA1Viw-vy8_HSZmS02R9MBMoyNsYi5y2ME", latitude, longitude, radius, googleType, placeName);
 
-            string r = GetResponse(url);
+            string r = WebService.GetResponse(url);
 
             List<Place> places = new List<Place>();
             for (int i = 0; i < numberToReturn; i++)
@@ -87,7 +85,7 @@ namespace DishWishWeb.Services
             city = city.Replace(" ", "%22");
             string url = string.Format("https://maps.googleapis.com/maps/api/place/autocomplete/json?input={0}&types=(cities)&sensor=true&key=AIzaSyA1Viw-vy8_HSZmS02R9MBMoyNsYi5y2ME", city);
 
-            string r = GetResponse(url);
+            string r = WebService.GetResponse(url);
 
             List<string> places = new List<string>();
             while (r.Contains("\"description\" : \""))
@@ -99,20 +97,5 @@ namespace DishWishWeb.Services
             return places;
         }
 
-
-        private static string GetResponse(string url)
-        {
-            HttpWebRequest webRequest = WebRequest.Create(url) as HttpWebRequest;
-            webRequest.Timeout = 20000;
-            webRequest.Method = "GET";
-
-            var response = webRequest.GetResponse();
-            using (var stream = response.GetResponseStream())
-            {
-                var reader = new StreamReader(stream);
-                var resp = reader.ReadToEnd();
-                return resp.ToString();
-            }
-        }
     }
 }

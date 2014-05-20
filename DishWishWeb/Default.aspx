@@ -35,48 +35,55 @@
                     $(".resultsDiv").hide();
                     return;
                 }
-                SearchList(data.d);
+                PlacesList(data.d);
             }
         });
+    }
 
-        function SearchList(results) {
-            if (!results.length) {
-                var prevLength = $(".search ul.results li");
-                if (prevLength.length > 0) {
-                    return;
-                }
+    function PlacesList(results) {
+        if (!results.length) {
+            var prevLength = $(".search ul.results li");
+            if (prevLength.length > 0) {
+                return;
             }
-
-            var items = "";
-            $(results).each(function (i) {
-                var that = this;
-                items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" ><a>' + this.Name + '</a></li>';
-            });
-
-            if (!items)
-                items += '<li><a>No Places Found</a></li>';
-
-            $(".results").html(items);
-            $(".resultsDiv").show();
-
         }
+
+        var items = "";
+        $(results).each(function (i) {
+            var that = this;
+            items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" ><a>' + this.Name + '</a></li>';
+        });
+
+        if (!items)
+            items += '<li><a>No Places Found</a></li>';
+
+        $(".results").html(items);
+        $(".resultsDiv").show();
+
     }
 
     function AddPlace(id) {
 
-        var name = $("#" + id + "li a")[0].innerHTML;
+        var name = "";
         var city = $("#CityTextbox").val();
-        var latitude = $("#" + id + "li a").parent().attr("latitude");
-        var longitude = $("#" + id + "li a").parent().attr("longitude");
-        var googleid = $("#" + id + "li a").parent().attr("googleid");
-        var googlereferenceid = $("#" + id + "li a").parent().attr("googlereferenceid");
 
-        $("#PlaceTextbox").val(name);
-        $("#LatitudeTextbox").val(latitude);
-        $("#LongitudeTextbox").val(longitude);
-        $("#GoogleIdTextbox").val(googleid);
-        $("#GoogleReferenceIdTextbox").val(googlereferenceid);
+        if (id >= 0) {
 
+            name = $("#" + id + "li a")[0].innerHTML;
+            var latitude = $("#" + id + "li a").parent().attr("latitude");
+            var longitude = $("#" + id + "li a").parent().attr("longitude");
+            var googleid = $("#" + id + "li a").parent().attr("googleid");
+            var googlereferenceid = $("#" + id + "li a").parent().attr("googlereferenceid");
+
+            $("#PlaceTextbox").val(name);
+            $("#LatitudeTextbox").val(latitude);
+            $("#LongitudeTextbox").val(longitude);
+            $("#GoogleIdTextbox").val(googleid);
+            $("#GoogleReferenceIdTextbox").val(googlereferenceid);
+        }
+        else {
+            name = $("#PlaceTextbox").val();
+        }
         $.ajax({
             type: "POST",
             url: "Default.aspx/GoogleImages",
@@ -84,12 +91,23 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data) {
-                $("#PopupOverlay").show();
-                $("#Popup").show();
+                PopulateImages(data.d);
             }
         });
 
         $(".resultsDiv").hide();
+    }
+
+    function PopulateImages(results) {
+        var images = "";
+        $(results).each(function () {
+            images += '<li><a><img src="' + this + '"/></a></li>';
+        });
+
+        $(".pickImages").html(images);
+
+        $("#PopupOverlay").show();
+        $("#Popup").show();
     }
 
     function CityAutoComplete() {
@@ -139,11 +157,14 @@
     <form id="form1" runat="server">
         <div id="PopupOverlay" style="display:none;" ></div>
         <div id="Popup" class="PlacePopup" style="display:none;">
-            <a class="button" style="position:absolute; bottom: 20px; right:90px;">Done</a>
-            <a class="button" style="position:absolute; bottom: 20px; right:10px;" onclick="$('#PopupOverlay').hide();$('#Popup').hide();">Cancel</a>
+            <ul class="pickImages">
+
+            </ul>
+            <a class="button" style="position:fixed; right:5%;margin-right:80px;">Done</a>
+            <a class="button" style="position:fixed; right:5%;" onclick="$('#PopupOverlay').hide();$('#Popup').hide();">Cancel</a>
         </div>
         <div class="search" >
-            <input type="text" class="field" id="PlaceTextbox" onkeyup="SearchPlaces();" PlaceHolder="Places">
+            <input type="text" class="field" id="PlaceTextbox" onkeyup="SearchPlaces();" PlaceHolder="Places"><a class="button" onclick="AddPlace(-1);">Search</a>
             <input id="CityTextbox" type="text" value="Austin" onkeyup="CityAutoComplete(event);" PlaceHolder="City"/>
             <input id="LatitudeTextbox" type="text" PlaceHolder="Latitude" />
             <input id="LongitudeTextbox" type="text" PlaceHolder="Longitude" />
