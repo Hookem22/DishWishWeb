@@ -52,8 +52,10 @@
 
         var items = "";
         $(results).each(function (i) {
-            var that = this;
-            items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" ><a>' + this.Name + '</a></li>';
+            if (this.Id)
+                items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="' + this.Id + '" imagecount=' + this.ImageCount + ' latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" ><a style="font-weight: bold;font-size:14px;" >' + this.Name + '</a></li>';
+            else
+                items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="" latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" ><a>' + this.Name + '</a></li>';
         });
 
         if (!items)
@@ -68,6 +70,8 @@
 
         var name = "";
         var city = $("#CityTextbox").val();
+        if (city.indexOf(",") > 0)
+            city = city.substr(0, city.indexOf(","));
 
         if (id >= 0) {
 
@@ -76,27 +80,42 @@
             var longitude = $("#" + id + "li a").parent().attr("longitude");
             var googleid = $("#" + id + "li a").parent().attr("googleid");
             var googlereferenceid = $("#" + id + "li a").parent().attr("googlereferenceid");
+            var placeid = $("#" + id + "li a").parent().attr("placeid");
 
             $("#PlaceTextbox").val(name);
             $("#LatitudeTextbox").val(latitude);
             $("#LongitudeTextbox").val(longitude);
             $("#GoogleIdTextbox").val(googleid);
             $("#GoogleReferenceIdTextbox").val(googlereferenceid);
+            $("#PlaceIdTextbox").val(placeid);
         }
         else {
             name = $("#PlaceTextbox").val();
         }
-        $.ajax({
-            type: "POST",
-            url: "Default.aspx/GoogleImages",
-            data: "{placeName:'" + escapeChars(name) + "', city:'" + escapeChars(city) + "'}",
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (data) {
-                PopulateImages(data.d);
-            }
-        });
 
+        if (placeid) {
+            var ct = $("#" + id + "li a").parent().attr("imagecount");
+            var container = "http://dishwishes.blob.core.windows.net/places/" + placeid + "_";
+
+            var urls = [];
+            for(var i = 0; i < ct; i++) {
+                urls.push(container + i);
+            }
+
+            DownloadImages(urls);
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: "Default.aspx/GoogleImages",
+                data: "{placeName:'" + escapeChars(name) + "', city:'" + escapeChars(city) + "'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    PopulateImages(data.d);
+                }
+            });
+        }
         $(".resultsDiv").hide();
     }
 
@@ -123,10 +142,15 @@
 
 
         var urls = [];
-        $(".picked").each(function (i) {
+        $(".picked").each(function () {
             urls.push($(this).attr("src"));
         });
 
+        DownloadImages(urls);
+    }
+
+    function DownloadImages(urls)
+    {
         $.ajax({
             type: "POST",
             url: "Default.aspx/DownloadImages",
@@ -137,16 +161,16 @@
 
                 var list = "<ul>";
                 $(data.d).each(function (i) {
-                    list += '<li><input id="Image' + i + 'Sort" type="text" style="width:50px;" value="' + i + '" /><br/><img src="' + this + '" style="width: ' + imgWidth + 'px;" /></li>';
+                    list += '<li><input type="text" style="width:50px;" value="' + i + '" /><br/><img src="' + this + '" style="width: ' + imgWidth + 'px;" /></li>';
                 });
-                list += "</ul>"
+                list += "</ul>";
 
                 $("#imagesDiv").html(list);
             }
         });
     }
 
-
+    //Crop
     $(document).bind('click', function () {
         $('#imagesDiv li img').bind('click', function (e) {
             if (cropping)
@@ -180,6 +204,33 @@
             });
         });
     });
+
+    function SavePlace()
+    {
+        var name = $("#PlaceTextbox").val();
+        var latitude = $("#LatitudeTextbox").val();
+        var longitude = $("#LongitudeTextbox").val();
+        var googleId = $("#GoogleIdTextbox").val();
+        var googleReferenceId = $("#GoogleReferenceIdTextbox").val();
+        var placeId = $("#PlaceIdTextbox").val();
+
+        var place = "{ Id:'" + placeId + "', Name:'" + escapeChars(name) + "', Latitude:'" + latitude + "', Longitude:'" + longitude + "', GoogleId:'" + googleId + "', GoogleReferenceId:'" + googleReferenceId + "'}"
+        var sortOrder = [];
+        $("#imagesDiv li input[type='text']").each(function () {
+            sortOrder.push($(this).val());
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "Default.aspx/SavePlace",
+            data: "{place:" + place + ", sortOrder:" + JSON.stringify(sortOrder) + "}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                
+            }
+        });
+    }
 
     function CityAutoComplete() {
         var city = $("#CityTextbox").val();
@@ -235,12 +286,15 @@
             <a class="button" style="position:fixed; right:5%;" onclick="$('#PopupOverlay').hide();$('#Popup').hide();">Cancel</a>
         </div>
         <div class="search" >
-            <input type="text" class="field" id="PlaceTextbox" onkeyup="SearchPlaces();" PlaceHolder="Places"><a class="button" onclick="AddPlace(-1);">Search</a>
+            <input type="text" class="field" id="PlaceTextbox" onkeyup="SearchPlaces();" PlaceHolder="Places">
+            <a class="button" onclick="AddPlace(-1);">Search</a>
+            <a class="button" onclick="SavePlace();">Save</a>
             <input id="CityTextbox" type="text" value="Austin" onkeyup="CityAutoComplete(event);" PlaceHolder="City"/>
             <input id="LatitudeTextbox" type="text" PlaceHolder="Latitude" />
             <input id="LongitudeTextbox" type="text" PlaceHolder="Longitude" />
             <input id="GoogleIdTextbox" type="text" PlaceHolder="GoogleId" />
             <input id="GoogleReferenceIdTextbox" type="text" PlaceHolder="GoogleReferenceId" />
+            <input id="PlaceIdTextbox" type="text" PlaceHolder="PlaceId" />
             <div class="resultsDiv">
                 <ul class="results">
 

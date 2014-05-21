@@ -50,13 +50,19 @@ namespace DishWishWeb.Services
                 if (p.Contains("\"lat\" : "))
                 {
                     p = p.Remove(0, p.IndexOf("\"lat\" : ") + 8);
-                    place.Latitude = p.Substring(0, p.IndexOf(",")).Trim();
+                    string lat = p.Substring(0, p.IndexOf(",")).Trim();
+                    double d_lat;
+                    if(double.TryParse(lat, out d_lat))
+                        place.Latitude = d_lat;
                 }
 
                 if (p.Contains("\"lng\" : "))
                 {
                     p = p.Remove(0, p.IndexOf("\"lng\" : ") + 8);
-                    place.Longitude = p.Substring(0, p.IndexOf("}")).Trim();
+                    string lng = p.Substring(0, p.IndexOf("}")).Trim();
+                    double d_lng;
+                    if (double.TryParse(lng, out d_lng))
+                        place.Longitude = d_lng;
                 }
                 if (p.Contains("\"id\" : \""))
                 {

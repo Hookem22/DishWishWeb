@@ -12,19 +12,39 @@ namespace DishWishWeb.Models
         {
 
         }
+
         public string Name { get; set; }
 
-        public string Latitude { get; set; }
+        public int ImageCount { get; set; }
 
-        public string Longitude { get; set; }
+        public double Latitude { get; set; }
+
+        public double Longitude { get; set; }
 
         public string GoogleId { get; set; }
 
         public string GoogleReferenceId { get; set; }
 
+
         public static List<Place> GoogleSearch(string placeName, string latitude, string longitude)
         {
-            return GooglePlacesService.GoogleSearchCity(placeName, latitude, longitude);
+            List<Place> places = GooglePlacesService.GoogleSearchCity(placeName, latitude, longitude);
+            if(placeName.Length > 3)
+            {
+                places.AddRange(Place.GetByName(placeName, latitude, longitude));
+            }
+
+            return places;
+        }
+
+        public static List<string> GoogleImages(string placeName, string city)
+        {
+            return GoogleImageService.GoogleImages(placeName, city);
+        }
+
+        public static List<string> GoogleAutoComplete(string city)
+        {
+            return GooglePlacesService.GoogleAutoComplete(city);
         }
 
         public static List<string> DownloadImages(List<string> urls)
@@ -58,14 +78,24 @@ namespace DishWishWeb.Models
             blob.CreateBlob("tmp_" + id);
         }
 
-        public static List<string> GoogleImages(string placeName, string city)
+        public void Save(List<int> sortOrder)
         {
-            return GoogleImageService.GoogleImages(placeName, city);
-        }
+            Name = Name.Replace("&amp;", "&");            
+            ImageCount = sortOrder.Count;
+            base.Save();
 
-        public static List<string> GoogleAutoComplete(string city)
-        {
-            return GooglePlacesService.GoogleAutoComplete(city);
+            BlobService blob = new BlobService("places");
+            ImageService service = new ImageService();
+            for (int i = 0, ii = sortOrder.Count; i < ii; i++)
+            {
+                string tmpBlobName = "tmp_" + i.ToString();
+                if (blob.Exists(tmpBlobName))
+                {
+                    service.Download(string.Format("{0}{1}", blob.container, tmpBlobName));
+                    blob.CreateBlob(string.Format("{0}_{1}", Id, sortOrder[i].ToString()));
+                }
+            }
+            blob.ClearTmpBlobs();
         }
     }
 }

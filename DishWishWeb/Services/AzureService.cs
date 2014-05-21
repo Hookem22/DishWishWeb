@@ -26,14 +26,17 @@ namespace DishWishWeb.Services
         public string Get(string id)
         {
             return client.GetStringAsync(string.Format("https://dishwishes.azure-mobile.net/tables/{0}/{1}", _tableName, id)).Result;
-
-            //Get by Name
-            //client.GetStringAsync(string.Format("https://dishwishes.azure-mobile.net/tables/{0}?$filter=Name eq {1}", _tableName, name)).Result;
         }
 
         public string Get()
         {
            return client.GetStringAsync(string.Format("https://dishwishes.azure-mobile.net/tables/{0}", _tableName)).Result;
+        }
+
+        public string GetByName(string name, string lat, string lng)
+        {
+            name = name.Replace("'", "''");
+            return client.GetStringAsync(string.Format("https://dishwishes.azure-mobile.net/api/getbyname?name={0}&lat={1}&lng={2}", name, lat, lng)).Result;
         }
 
         public string Post(dynamic obj)

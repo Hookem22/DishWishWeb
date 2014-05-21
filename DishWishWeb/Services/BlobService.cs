@@ -60,7 +60,6 @@ namespace DishWishWeb.Services
 
             try
             {
-                // Delete the blob.
                 blockBlob.Delete();
             }
             catch { }
@@ -73,5 +72,22 @@ namespace DishWishWeb.Services
                 DeleteBlob("tmp_" + i.ToString());
             }
         }
+
+        public bool Exists(string blobName)
+        {
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = blobClient.GetContainerReference(_containerName);
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
+            try
+            {
+                blockBlob.FetchAttributes();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
     }
 }

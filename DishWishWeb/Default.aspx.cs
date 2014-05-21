@@ -40,6 +40,11 @@ namespace DishWishWeb
             Place.CropImage(id, percentCrop);
         }
 
+        [WebMethod]
+        public static void SavePlace(Place place, List<int> sortOrder)
+        {
+            place.Save(sortOrder);
+        }
 
         [WebMethod]
         public static List<string> CityAutoComplete(string city)
