@@ -29,16 +29,16 @@ namespace DishWishWeb.Models
 
         public static List<string> DownloadImages(List<string> urls)
         {
-            ImageService service = new ImageService();
-            service.ClearTmpImages();
-
             BlobService blob = new BlobService("places");
             blob.ClearTmpBlobs();
 
             List<string> blobUrls = new List<string>();
             for(int i = 0; i < urls.Count; i++)
             {
-                string tmpUrl = service.SaveTmpImage(urls[i], i.ToString());
+                ImageService service = new ImageService();
+
+                string tmpUrl = "tmp_" + i.ToString();
+                service.SaveTmpImage(urls[i]);
                 blob.CreateBlob(tmpUrl);
                 blobUrls.Add(blob.container + tmpUrl);
             }
@@ -49,10 +49,12 @@ namespace DishWishWeb.Models
 
         public static void CropImage(string id, double percentCrop)
         {
-            ImageService service = new ImageService();
-            service.Crop(id, percentCrop);
-
             BlobService blob = new BlobService("places");
+            
+            ImageService service = new ImageService();
+            service.Download(string.Format("{0}tmp_{1}", blob.container, id));
+            service.Crop(percentCrop);
+
             blob.CreateBlob("tmp_" + id);
         }
 

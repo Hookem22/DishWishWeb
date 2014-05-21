@@ -35,8 +35,7 @@ namespace DishWishWeb.Services
                 CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
 
                 // Create or overwrite the "myblob" blob with contents from a local file.
-                ImageService service = new ImageService();
-                using (var fileStream = System.IO.File.OpenRead(string.Format(@"{0}\{1}.png", service.localFolder, blobName)))
+                using (var fileStream = System.IO.File.OpenRead(new ImageService().currentFile))
                 {
                     blockBlob.UploadFromStream(fileStream);
                 }

@@ -13,6 +13,7 @@
     var currentLat = 30.3077609;
     var currentLng = -97.7534014;
     var imgWidth = 450;
+    var cropping = false;
 
     function SearchPlaces() {
 
@@ -148,14 +149,23 @@
 
     $(document).bind('click', function () {
         $('#imagesDiv li img').bind('click', function (e) {
+            if (cropping)
+                return;
+
+            cropping = true;
+
             var offset = $(this).offset();
             var x = (e.pageX - offset.left);
             var y = (e.pageY - offset.top);
 
+            var percentCrop = x / imgWidth;
+
             var src = $(this).attr("src");
             var id = src.substr(src.lastIndexOf("_") + 1);
+            if (id.indexOf("?") >= 0)
+                id = id.substr(0, id.indexOf("?"));
 
-            var percentCrop = x / imgWidth;
+            $(this).attr("src", "http://hk.centamap.com/gc/img/loading.gif");
 
             $.ajax({
                 type: "POST",
@@ -164,9 +174,8 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
-                    var thisImg = $("#imagesDiv img:eq(" + id + ")");
-                    console.log(thisImg);
-                    $(thisImg).attr("src", src + "?" + new Date().getTime());
+                    $("#imagesDiv img:eq(" + id + ")").attr("src", src);// + "?" + new Date().getTime());
+                    cropping = false;
                 }
             });
         });

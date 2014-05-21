@@ -10,56 +10,69 @@ namespace DishWishWeb.Services
 {
     public class ImageService
     {
-        public string localFolder;
-        string localFileName;
-        string localFileNameSort;
+        const int fullImageWidth = 640;
+        const int fullImageHeight = 1136;
 
-        int fullImageWidth = 640;
-        int fullImageHeight = 1136;
+        public string currentFile;
+        string tempFile;
 
         public ImageService()
         {
-            localFolder = Path.Combine(Path.GetTempPath(), "DishWish");
-            if (!Directory.Exists(localFolder))
-                Directory.CreateDirectory(localFolder);
-
-            localFileName = Path.Combine(localFolder, "tmp.png");
-            localFileNameSort = Path.Combine(localFolder, "tmp_{0}.png");
+            currentFile = Path.Combine(tempFolder, "current.png");
+            tempFile = Path.Combine(tempFolder, "tmp.png");
         }
 
-        public string SaveTmpImage(string url, string id)
-        {           
-            Download(url);
-            ResizeImage(id);
-            SetTmpImage(id);
-            ScaleImage(id);
+        private string tempFolder { get { return Path.Combine(Path.GetTempPath(), "DishWish"); } }
 
-            return "tmp_" + id;
-        }
-
-        public void Crop(string id, double percentCrop)
+        private void DirectoryInit()
         {
-            SetTmpImage(id);
-            CropImage(id, percentCrop);
-            SetTmpImage(id);
-            ResizeImage(id);
+            if (!Directory.Exists(tempFolder))
+            {
+                Directory.CreateDirectory(tempFolder);
+            }
+            else
+            {
+                DirectoryInfo folder = new DirectoryInfo(tempFolder);
+                foreach (FileInfo file in folder.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+        }
+        
+        public void SaveTmpImage(string url)
+        {
+            DirectoryInit();
+            Download(url);
+            ResizeImage();
+            SetCurrentImage();
+            ScaleImage();
+            SetCurrentImage();
+        }
+
+        public void Crop(double percentCrop)
+        {
+            CropImage(percentCrop);
+            SetCurrentImage();
+            ResizeImage();
+            SetCurrentImage();
         }
 
         public void Download(string url)
         {
-            Delete(localFileName);
+            Delete(currentFile);
             using (WebClient client = new WebClient())
             {
-                client.DownloadFile(url, localFileName);
+                client.DownloadFile(url, currentFile);
             }
         }
 
 
-        public void ResizeImage(string id)
+        public void ResizeImage()
         {
             try
             {
-                using (System.Drawing.Image original = System.Drawing.Image.FromFile(localFileName))
+                using (System.Drawing.Image original = System.Drawing.Image.FromFile(currentFile))
                 {
 
                     double ratio = (double)fullImageWidth / (double)original.Width;
@@ -79,8 +92,7 @@ namespace DishWishWeb.Services
                         using (System.Drawing.Graphics gr = System.Drawing.Graphics.FromImage(newPic))
                         {
                             gr.DrawImage(original, 0, 0, (newWidth), (newHeight));
-                            string newFilename = string.Format(localFileNameSort, id);
-                            newPic.Save(newFilename, System.Drawing.Imaging.ImageFormat.Png);
+                            newPic.Save(tempFile, System.Drawing.Imaging.ImageFormat.Png);
                         }
                     }
                 }
@@ -91,11 +103,11 @@ namespace DishWishWeb.Services
             }
         }
 
-        public void ScaleImage(string id)
+        public void ScaleImage()
         {
             try
             {
-                using (System.Drawing.Image original = System.Drawing.Image.FromFile(localFileName))
+                using (System.Drawing.Image original = System.Drawing.Image.FromFile(currentFile))
                 {
                     double ratio = 640.0 / (double)original.Width;
                     double d_newHeight = (double)original.Height * ratio;
@@ -111,8 +123,7 @@ namespace DishWishWeb.Services
 
                             gr.DrawImage(original, new Point(0, yOffset));
 
-                            string newFilename = string.Format(localFileNameSort, id);
-                            newPic.Save(newFilename, System.Drawing.Imaging.ImageFormat.Png);
+                            newPic.Save(tempFile, System.Drawing.Imaging.ImageFormat.Png);
                         }
                     }
                 }
@@ -123,35 +134,62 @@ namespace DishWishWeb.Services
             }
         }
 
-        public void CropImage(string id, double percentCrop)
-        {
-            Bitmap src = Image.FromFile(localFileName) as Bitmap;
-
-            double offsetX = percentCrop * (double)src.Width;
-            double offsetY = (percentCrop * (double)src.Height) / 2;
-            double newHeight = (1 - percentCrop) * (double)src.Height;
-            double newWidth = (1 - percentCrop) * (double)src.Width;
-
-            Rectangle cropRect = new Rectangle((int)offsetX, (int)offsetY, (int)newWidth, (int)newHeight);
-
-            using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(cropRect.Width, cropRect.Height))
-            {
-                using (Graphics g = Graphics.FromImage(newPic))
-                {
-                    g.DrawImage(src, new Rectangle(0, 0, newPic.Width, newPic.Height),
-                                     cropRect, GraphicsUnit.Pixel);
-                    string newFilename = string.Format(localFileNameSort, id);
-                    newPic.Save(newFilename, System.Drawing.Imaging.ImageFormat.Png);
-                }
-            }
-        }
-
-        private void SetTmpImage(string id)
+        public void CropImage(double percentCrop)
         {
             try
             {
-                Delete(localFileName);
-                File.Move(string.Format(localFileNameSort, id), localFileName);
+                using (System.Drawing.Image original = System.Drawing.Image.FromFile(currentFile))
+                {
+                    double offsetX;
+                    double offsetY;
+                    double newHeight;
+                    double newWidth;
+
+                    if (percentCrop < .5)
+                    {
+                        offsetX = percentCrop * (double)original.Width;
+                        offsetY = (percentCrop * (double)original.Height) / 2;
+                        newHeight = (1 - percentCrop) * (double)original.Height;
+                        newWidth = (1 - percentCrop) * (double)original.Width;
+                    }
+                    else
+                    {
+                        percentCrop = 1 - percentCrop;
+
+                        offsetX = 0;
+                        offsetY = (percentCrop * (double)original.Height) / 2;
+                        newHeight = (1 - percentCrop) * (double)original.Height;
+                        newWidth = (1 - percentCrop) * (double)original.Width;
+                    }
+
+
+                    Rectangle cropRect = new Rectangle((int)offsetX, (int)offsetY, (int)newWidth, (int)newHeight);
+
+                    using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(cropRect.Width, cropRect.Height))
+                    {
+                        using (System.Drawing.Graphics gr = System.Drawing.Graphics.FromImage(newPic))
+                        {
+                            gr.DrawImage(original, new Rectangle(0, 0, newPic.Width, newPic.Height),
+                                             cropRect, GraphicsUnit.Pixel);
+
+                            newPic.Save(tempFile, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string desc = ex.ToString();
+            }
+            
+        }
+
+        private void SetCurrentImage()
+        {
+            try
+            {
+                Delete(currentFile);
+                File.Move(tempFile, currentFile);
             }
             catch { }
 
@@ -165,21 +203,6 @@ namespace DishWishWeb.Services
                     File.Delete(url);
             }
             catch { }
-        }
-
-        public void ClearTmpImages()
-        {
-            try
-            {
-                for (int i = 0; i <= 10; i++)
-                {
-                    string url = string.Format(localFileNameSort, i.ToString());
-                    if (File.Exists(url))
-                        File.Delete(url);
-                }
-            }
-            catch { }
-
         }
 
         public void Upload(Image img)
