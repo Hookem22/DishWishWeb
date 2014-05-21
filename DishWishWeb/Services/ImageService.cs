@@ -10,32 +10,39 @@ namespace DishWishWeb.Services
 {
     public class ImageService
     {
-        string localFileName = @"path\tmp.png";
-        string localFileNameSort = @"path\tmp_{0}.png";
+        public string localFolder;
+        string localFileName;
+        string localFileNameSort;
 
         int fullImageWidth = 640;
         int fullImageHeight = 1136;
 
         public ImageService()
         {
+            localFolder = Path.Combine(Path.GetTempPath(), "DishWish");
+            if (!Directory.Exists(localFolder))
+                Directory.CreateDirectory(localFolder);
 
+            localFileName = Path.Combine(localFolder, "tmp.png");
+            localFileNameSort = Path.Combine(localFolder, "tmp_{0}.png");
         }
 
-        public string SaveTmpImage(string url, string sortId)
-        {
+        public string SaveTmpImage(string url, string id)
+        {           
             Download(url);
-            ResizeImage(sortId, localFileName);
-            SetTmpImage(sortId);
-            ScaleImage(sortId);
+            ResizeImage(id);
+            SetTmpImage(id);
+            ScaleImage(id);
 
-            return "tmp_" + sortId.ToString();
+            return "tmp_" + id;
         }
 
         public void Crop(string id, double percentCrop)
         {
             SetTmpImage(id);
             CropImage(id, percentCrop);
-            ResizeImage(id, @"path\crop.png");
+            SetTmpImage(id);
+            ResizeImage(id);
         }
 
         public void Download(string url)
@@ -48,11 +55,11 @@ namespace DishWishWeb.Services
         }
 
 
-        public void ResizeImage(string sortId, string fromFileName)
+        public void ResizeImage(string id)
         {
             try
             {
-                using (System.Drawing.Image original = System.Drawing.Image.FromFile(fromFileName))
+                using (System.Drawing.Image original = System.Drawing.Image.FromFile(localFileName))
                 {
 
                     double ratio = (double)fullImageWidth / (double)original.Width;
@@ -72,7 +79,7 @@ namespace DishWishWeb.Services
                         using (System.Drawing.Graphics gr = System.Drawing.Graphics.FromImage(newPic))
                         {
                             gr.DrawImage(original, 0, 0, (newWidth), (newHeight));
-                            string newFilename = string.Format(localFileNameSort, sortId);
+                            string newFilename = string.Format(localFileNameSort, id);
                             newPic.Save(newFilename, System.Drawing.Imaging.ImageFormat.Png);
                         }
                     }
@@ -84,7 +91,7 @@ namespace DishWishWeb.Services
             }
         }
 
-        public void ScaleImage(string sortId)
+        public void ScaleImage(string id)
         {
             try
             {
@@ -104,7 +111,7 @@ namespace DishWishWeb.Services
 
                             gr.DrawImage(original, new Point(0, yOffset));
 
-                            string newFilename = string.Format(localFileNameSort, sortId);
+                            string newFilename = string.Format(localFileNameSort, id);
                             newPic.Save(newFilename, System.Drawing.Imaging.ImageFormat.Png);
                         }
                     }
@@ -133,7 +140,7 @@ namespace DishWishWeb.Services
                 {
                     g.DrawImage(src, new Rectangle(0, 0, newPic.Width, newPic.Height),
                                      cropRect, GraphicsUnit.Pixel);
-                    string newFilename = @"path\crop.png";
+                    string newFilename = string.Format(localFileNameSort, id);
                     newPic.Save(newFilename, System.Drawing.Imaging.ImageFormat.Png);
                 }
             }
@@ -155,7 +162,7 @@ namespace DishWishWeb.Services
             try
             {
                 if (File.Exists(url))
-                      File.Delete(url);
+                    File.Delete(url);
             }
             catch { }
         }
@@ -166,11 +173,13 @@ namespace DishWishWeb.Services
             {
                 for (int i = 0; i <= 10; i++)
                 {
-                    if (File.Exists(string.Format(localFileNameSort, i.ToString())))
-                        File.Delete(string.Format(localFileNameSort, i.ToString()));
+                    string url = string.Format(localFileNameSort, i.ToString());
+                    if (File.Exists(url))
+                        File.Delete(url);
                 }
             }
             catch { }
+
         }
 
         public void Upload(Image img)
