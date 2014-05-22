@@ -41,9 +41,10 @@ namespace DishWishWeb
         }
 
         [WebMethod]
-        public static void SavePlace(Place place, List<int> sortOrder)
+        public static Place SavePlace(Place place, List<int> sortOrder)
         {
             place.Save(sortOrder);
+            return place;
         }
 
         [WebMethod]

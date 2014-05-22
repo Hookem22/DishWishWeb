@@ -39,7 +39,15 @@ namespace DishWishWeb.Models
 
         public static List<string> GoogleImages(string placeName, string city)
         {
-            return GoogleImageService.GoogleImages(placeName, city);
+            List<string> urls = GoogleImageService.GoogleImages(placeName, city);
+            System.Threading.Thread.Sleep(200);
+            urls.AddRange(GoogleImageService.GoogleImages(placeName + " inside", city));
+            System.Threading.Thread.Sleep(200);
+            urls.AddRange(GoogleImageService.GoogleImages(placeName + " food", city));
+            System.Threading.Thread.Sleep(200);
+            urls.AddRange(GoogleImageService.GoogleImages(placeName + " yelp", city));
+
+            return urls;
         }
 
         public static List<string> GoogleAutoComplete(string city)

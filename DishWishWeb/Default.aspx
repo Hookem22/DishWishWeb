@@ -207,6 +207,8 @@
 
     function SavePlace()
     {
+        $(".search .fbLoading").show();
+
         var name = $("#PlaceTextbox").val();
         var latitude = $("#LatitudeTextbox").val();
         var longitude = $("#LongitudeTextbox").val();
@@ -227,7 +229,17 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data) {
-                
+                $(".search .fbLoading").hide();
+
+                $("#PlaceIdTextbox").val(data.d.Id);
+
+                var container = "http://dishwishes.blob.core.windows.net/places/" + data.d.Id + "_";
+                var list = "<ul>";
+                for(var i = 0, ii = data.d.ImageCount; i < ii; i++) {
+                    list += '<li><input type="text" style="width:50px;" value="' + i + '" /><br/><img src="' + container + i + '" style="width: ' + imgWidth + 'px;" /></li>';                  
+                }
+                list += "</ul>";
+                $("#imagesDiv").html(list);
             }
         });
     }

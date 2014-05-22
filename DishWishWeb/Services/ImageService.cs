@@ -32,11 +32,15 @@ namespace DishWishWeb.Services
             }
             else
             {
-                DirectoryInfo folder = new DirectoryInfo(tempFolder);
-                foreach (FileInfo file in folder.GetFiles())
+                try
                 {
-                    file.Delete();
+                    DirectoryInfo folder = new DirectoryInfo(tempFolder);
+                    foreach (FileInfo file in folder.GetFiles())
+                    {
+                        file.Delete();
+                    }
                 }
+                catch { }
             }
         }
         
