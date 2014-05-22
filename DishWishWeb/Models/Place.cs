@@ -103,7 +103,6 @@ namespace DishWishWeb.Models
                     blob.CreateBlob(string.Format("{0}_{1}", Id, sortOrder[i].ToString()));
                 }
             }
-            blob.ClearTmpBlobs();
         }
     }
 }

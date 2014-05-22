@@ -208,6 +208,7 @@
     function SavePlace()
     {
         $(".search .fbLoading").show();
+        $(".resultsDiv").hide();
 
         var name = $("#PlaceTextbox").val();
         var latitude = $("#LatitudeTextbox").val();
@@ -221,6 +222,18 @@
         $("#imagesDiv li input[type='text']").each(function () {
             sortOrder.push($(this).val());
         });
+
+        //Validation
+        var sorted = sortOrder.sort(); 
+        for (var i = 0; i < sorted.length; i++) {
+            if (sorted[i] != i) {
+                $(".results").html("<li><a>Sort Order Error</a></li>");
+                $(".resultsDiv").show();
+                $(".search .fbLoading").hide();
+                return;
+            }
+        }
+
 
         $.ajax({
             type: "POST",
