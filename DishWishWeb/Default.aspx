@@ -99,7 +99,7 @@
 
             var urls = [];
             for(var i = 0; i < ct; i++) {
-                urls.push(container + i);
+                urls.push(container + i + ".png");
             }
 
             DownloadImages(urls);
@@ -186,8 +186,8 @@
 
             var src = $(this).attr("src");
             var id = src.substr(src.lastIndexOf("_") + 1);
-            if (id.indexOf("?") >= 0)
-                id = id.substr(0, id.indexOf("?"));
+            if (id.indexOf(".png") >= 0)
+                id = id.substr(0, id.indexOf(".png"));
 
             $(this).attr("src", "http://hk.centamap.com/gc/img/loading.gif");
 
@@ -249,7 +249,7 @@
                 var container = "http://dishwishes.blob.core.windows.net/places/" + data.d.Id + "_";
                 var list = "<ul>";
                 for(var i = 0, ii = data.d.ImageCount; i < ii; i++) {
-                    list += '<li><input type="text" style="width:50px;" value="' + i + '" /><br/><img src="' + container + i + '" style="width: ' + imgWidth + 'px;" /></li>';                  
+                    list += '<li><input type="text" style="width:50px;" value="' + i + '" /><br/><img src="' + container + i + '.png" style="width: ' + imgWidth + 'px;" /></li>';                  
                 }
                 list += "</ul>";
                 $("#imagesDiv").html(list);

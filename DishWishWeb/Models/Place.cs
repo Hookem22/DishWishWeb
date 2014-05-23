@@ -65,7 +65,7 @@ namespace DishWishWeb.Models
             {
                 ImageService service = new ImageService();
 
-                string tmpUrl = "tmp_" + i.ToString();
+                string tmpUrl = "tmp_" + i.ToString() + ".png";
                 service.SaveTmpImage(urls[i]);
                 blob.CreateBlob(tmpUrl);
                 blobUrls.Add(blob.container + tmpUrl);
@@ -80,10 +80,10 @@ namespace DishWishWeb.Models
             BlobService blob = new BlobService("places");
             
             ImageService service = new ImageService();
-            service.Download(string.Format("{0}tmp_{1}", blob.container, id));
+            service.Download(string.Format("{0}tmp_{1}.png", blob.container, id));
             service.Crop(percentCrop);
 
-            blob.CreateBlob("tmp_" + id);
+            blob.CreateBlob(string.Format("tmp_{0}.png", id));
         }
 
         public void Save(List<int> sortOrder)
@@ -96,11 +96,11 @@ namespace DishWishWeb.Models
             ImageService service = new ImageService();
             for (int i = 0, ii = sortOrder.Count; i < ii; i++)
             {
-                string tmpBlobName = "tmp_" + i.ToString();
+                string tmpBlobName = string.Format("tmp_{0}.png", i.ToString());
                 if (blob.Exists(tmpBlobName))
                 {
                     service.Download(string.Format("{0}{1}", blob.container, tmpBlobName));
-                    blob.CreateBlob(string.Format("{0}_{1}", Id, sortOrder[i].ToString()));
+                    blob.CreateBlob(string.Format("{0}_{1}.png", Id, sortOrder[i].ToString()));
                 }
             }
         }
