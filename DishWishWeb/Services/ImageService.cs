@@ -11,7 +11,7 @@ namespace DishWishWeb.Services
     public class ImageService
     {
         const int fullImageWidth = 640;
-        const int fullImageHeight = 1136;
+        const int fullImageHeight = 1136 - 200;
 
         public string currentFile;
         string tempFile;

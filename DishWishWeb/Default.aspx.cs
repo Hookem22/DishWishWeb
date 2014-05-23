@@ -12,14 +12,14 @@ namespace DishWishWeb
     public partial class Default : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
-        {           
+        {
 
         }
 
         [WebMethod]
-        public static List<Place> SearchPlaces(string placeName, double latitude, double longitude)
+        public static List<Place> SearchPlaces(string placeName, string city, double latitude, double longitude)
         {
-            return Place.GoogleSearch(placeName, latitude.ToString(), longitude.ToString());
+            return Place.GoogleSearch(placeName, city, latitude.ToString(), longitude.ToString());
         }
 
         [WebMethod]

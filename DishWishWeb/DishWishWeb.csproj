@@ -157,7 +157,9 @@
     <Compile Include="Services\GoogleImageService.cs" />
     <Compile Include="Services\GooglePlacesService.cs" />
     <Compile Include="Services\ImageService.cs" />
+    <Compile Include="Services\OAuthBase.cs" />
     <Compile Include="Services\WebService.cs" />
+    <Compile Include="Services\YelpService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

@@ -18,6 +18,7 @@
     function SearchPlaces() {
 
         var searchTerm = $("#PlaceTextbox").val();
+        var city = $("#CityTextbox").val();
         if (!searchTerm) {
             $(".resultsDiv").hide();
             return;
@@ -28,7 +29,7 @@
         $.ajax({
             type: "POST",
             url: "Default.aspx/SearchPlaces",
-            data: "{placeName:'" + escapeChars(searchTerm) + "', latitude:" + currentLat + ", longitude: " + currentLng + "}",
+            data: "{placeName:'" + escapeChars(searchTerm) + "',city:'" + escapeChars(city) + "', latitude:" + currentLat + ", longitude: " + currentLng + "}",
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data) {
@@ -52,10 +53,11 @@
 
         var items = "";
         $(results).each(function (i) {
+            console.log(this);
             if (this.Id)
-                items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="' + this.Id + '" imagecount=' + this.ImageCount + ' latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" ><a style="font-weight: bold;font-size:14px;" >' + this.Name + '</a></li>';
+                items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="' + this.Id + '" imagecount=' + this.ImageCount + ' latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" yelpid="' + this.YelpId + '" ><a style="font-weight: bold;font-size:14px;" >' + this.Name + '</a></li>';
             else
-                items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="" latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" ><a>' + this.Name + '</a></li>';
+                items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="" latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" yelpid="' + this.YelpId + '" ><a>' + this.Name + '</a></li>';
         });
 
         if (!items)
@@ -75,19 +77,11 @@
 
         if (id >= 0) {
 
-            name = $("#" + id + "li a")[0].innerHTML;
-            var latitude = $("#" + id + "li a").parent().attr("latitude");
-            var longitude = $("#" + id + "li a").parent().attr("longitude");
-            var googleid = $("#" + id + "li a").parent().attr("googleid");
-            var googlereferenceid = $("#" + id + "li a").parent().attr("googlereferenceid");
-            var placeid = $("#" + id + "li a").parent().attr("placeid");
-
-            $("#PlaceTextbox").val(name);
-            $("#LatitudeTextbox").val(latitude);
-            $("#LongitudeTextbox").val(longitude);
-            $("#GoogleIdTextbox").val(googleid);
-            $("#GoogleReferenceIdTextbox").val(googlereferenceid);
-            $("#PlaceIdTextbox").val(placeid);
+            if ($("#" + id + "li a").parent().attr("yelpid")) {
+                //geocode
+            }
+            else
+                fillTextboxes(id);
         }
         else {
             name = $("#PlaceTextbox").val();
@@ -117,6 +111,29 @@
             });
         }
         $(".resultsDiv").hide();
+    }
+
+    function fillTextboxes(id)
+    {
+        var name = $("#" + id + "li a")[0].innerHTML;
+        var latitude = $("#" + id + "li a").parent().attr("latitude");
+        var longitude = $("#" + id + "li a").parent().attr("longitude");
+        var googleid = $("#" + id + "li a").parent().attr("googleid");
+        var googlereferenceid = $("#" + id + "li a").parent().attr("googlereferenceid");
+        var yelpid = $("#" + id + "li a").parent().attr("yelpid");
+        var placeid = $("#" + id + "li a").parent().attr("placeid");
+
+        $("#PlaceTextbox").val(name);
+        $("#LatitudeTextbox").val(latitude);
+        $("#LongitudeTextbox").val(longitude);
+        if (googleid)
+            $("#GoogleIdTextbox").val(googleid);
+        if (googlereferenceid)
+            $("#GoogleReferenceIdTextbox").val(googlereferenceid);
+        if (yelpid)
+            $("#YelpIdTextbox").val(yelpid);
+        if (placeid)
+            $("#PlaceIdTextbox").val(placeid);
     }
 
     function PopulateImages(results) {
@@ -324,6 +341,7 @@
             <input id="LongitudeTextbox" type="text" PlaceHolder="Longitude" />
             <input id="GoogleIdTextbox" type="text" PlaceHolder="GoogleId" />
             <input id="GoogleReferenceIdTextbox" type="text" PlaceHolder="GoogleReferenceId" />
+            <input id="YelpIdTextbox" type="text" PlaceHolder="YelpId" />
             <input id="PlaceIdTextbox" type="text" PlaceHolder="PlaceId" />
             <div class="resultsDiv">
                 <ul class="results">

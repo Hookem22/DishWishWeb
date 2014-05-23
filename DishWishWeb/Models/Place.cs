@@ -25,10 +25,15 @@ namespace DishWishWeb.Models
 
         public string GoogleReferenceId { get; set; }
 
+        public string YelpId { get; set; }
 
-        public static List<Place> GoogleSearch(string placeName, string latitude, string longitude)
+        public static List<Place> GoogleSearch(string placeName, string city, string latitude, string longitude)
         {
+            return YelpService.Search(placeName, city);
+            
+            
             List<Place> places = GooglePlacesService.GoogleSearchCity(placeName, latitude, longitude);
+
             if(placeName.Length > 3)
             {
                 places.AddRange(Place.GetByName(placeName, latitude, longitude));
