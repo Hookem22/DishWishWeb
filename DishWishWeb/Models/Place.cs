@@ -28,16 +28,41 @@ namespace DishWishWeb.Models
         public string YelpId { get; set; }
 
         public static List<Place> GoogleSearch(string placeName, string city, string latitude, string longitude)
-        {
-            return YelpService.Search(placeName, city);
-            
-            
-            List<Place> places = GooglePlacesService.GoogleSearchCity(placeName, latitude, longitude);
+        {   
+            List<Place> googlePlaces = GooglePlacesService.GoogleSearchCity(placeName, latitude, longitude);
+            List<Place> yelpPlaces = YelpService.Search(placeName, city);
+            List<Place> places = new List<Place>();
 
-            if(placeName.Length > 3)
+            foreach(Place p1 in googlePlaces)
             {
-                places.AddRange(Place.GetByName(placeName, latitude, longitude));
+                Place p2 = yelpPlaces.Find(p => p.GoogleReferenceId.Contains(p1.YelpId));
+                if (p2 == null) {
+                    p2 = yelpPlaces.Find(p => p.GoogleReferenceId.Contains(p1.YelpId.Substring(0, 3)));
+                    if (p2 != null && p1.Name.Length > 2 && p2.Name.Length > 2 && p1.Name.Substring(0, 3) != p2.Name.Substring(0, 3))
+                        p2 = null;
+                }
+                if(p2 != null)
+                {
+                    p1.YelpId = p2.YelpId;
+                    yelpPlaces.Remove(p2);
+                    places.Add(p1);
+                }
+                else
+                {
+                    p1.YelpId = "";
+                }
             }
+
+            foreach(Place p in googlePlaces)
+            {
+                if (string.IsNullOrEmpty(p.YelpId))
+                    places.Add(p);
+            }
+
+            places.AddRange(yelpPlaces);
+
+            //places.AddRange(Place.GetByName(placeName, latitude, longitude));
+
 
             return places;
         }

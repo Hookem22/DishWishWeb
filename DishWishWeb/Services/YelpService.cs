@@ -67,6 +67,9 @@ namespace DishWishWeb.Services
                 Place place = new Place();
                 places.Add(place);
 
+                place.Id = "";
+                place.GoogleId = "";
+
                 if (p.Contains("\"name\": \""))
                 {
                     p = p.Remove(0, p.IndexOf("\"name\": \"") + 9);

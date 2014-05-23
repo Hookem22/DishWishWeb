@@ -17,9 +17,9 @@
 
     function SearchPlaces() {
 
-        var searchTerm = $("#PlaceTextbox").val();
-        var city = $("#CityTextbox").val();
-        if (!searchTerm) {
+        var searchTerm = $("#Place").val();
+        var city = $("#City").val();
+        if (!searchTerm || searchTerm.length < 3) {
             $(".resultsDiv").hide();
             return;
         }
@@ -34,7 +34,7 @@
             dataType: "json",
             success: function (data) {
                 $(".search .fbLoading").hide();
-                if (!$("#PlaceTextbox").val()) {
+                if (!$("#Place").val()) {
                     $(".resultsDiv").hide();
                     return;
                 }
@@ -53,11 +53,15 @@
 
         var items = "";
         $(results).each(function (i) {
-            console.log(this);
-            if (this.Id)
-                items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="' + this.Id + '" imagecount=' + this.ImageCount + ' latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" yelpid="' + this.YelpId + '" ><a style="font-weight: bold;font-size:14px;" >' + this.Name + '</a></li>';
+            var style = "";
+            if (this.GoogleId && this.YelpId)
+                style = "color:green;";
+            else if (this.YelpId)
+                style = "color:#c41200;";
             else
-                items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="" latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" yelpid="' + this.YelpId + '" ><a>' + this.Name + '</a></li>';
+                style = "color:#4285f4";
+
+            items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="' + this.Id + '" imagecount=' + this.ImageCount + ' latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" yelpid="' + this.YelpId + '" ><a style="' + style + '" >' + this.Name + '</a></li>';
         });
 
         if (!items)
@@ -72,19 +76,20 @@
 
         var placeid = $("#" + id + "li a").parent().attr("placeid");
         var name = $("#" + id + "li a")[0].innerHTML;
-        var city = $("#CityTextbox").val();
-        if (city.indexOf(",") > 0)
-            city = city.substr(0, city.indexOf(","));
+        var latitude = $("#" + id + "li a").parent().attr("latitude");
+        var longitude = $("#" + id + "li a").parent().attr("longitude");
+        var city = $("#City").val();
 
         if (id >= 0) {
 
-            if ($("#" + id + "li a").parent().attr("yelpid")) {
+            if (!latitude) {
                 var address = $("#" + id + "li a").parent().attr("googlereferenceid");
                 var geocoder = new google.maps.Geocoder();
                 geocoder.geocode({ 'address': address }, function (results, status) {
                     if (status == google.maps.GeocoderStatus.OK) {
-                        var latitude = results[0].geometry.location.lat();
-                        var longitude = results[0].geometry.location.lng();
+                        latitude = results[0].geometry.location.lat();
+                        longitude = results[0].geometry.location.lng();
+                        $("#" + id + "li a").parent().attr("googlereferenceid", "");
 
                         fillTextboxes(id, latitude, longitude);
                     }
@@ -94,7 +99,7 @@
                 fillTextboxes(id, latitude, longitude);
         }
         else {
-            name = $("#PlaceTextbox").val();
+            name = $("#Place").val();
         }
 
         if (placeid) {
@@ -131,17 +136,17 @@
         var yelpid = $("#" + id + "li a").parent().attr("yelpid");
         var placeid = $("#" + id + "li a").parent().attr("placeid");
 
-        $("#PlaceTextbox").val(name);
-        $("#LatitudeTextbox").val(latitude);
-        $("#LongitudeTextbox").val(longitude);
+        $("#Place").val(name);
+        $("#Latitude").val(latitude);
+        $("#Longitude").val(longitude);
         if (googleid)
-            $("#GoogleIdTextbox").val(googleid);
+            $("#GoogleId").val(googleid);
         if (googlereferenceid)
-            $("#GoogleReferenceIdTextbox").val(googlereferenceid);
+            $("#GoogleReferenceId").val(googlereferenceid);
         if (yelpid)
-            $("#YelpIdTextbox").val(yelpid);
+            $("#YelpId").val(yelpid);
         if (placeid)
-            $("#PlaceIdTextbox").val(placeid);
+            $("#PlaceId").val(placeid);
     }
 
     function PopulateImages(results) {
@@ -235,12 +240,12 @@
         $(".search .fbLoading").show();
         $(".resultsDiv").hide();
 
-        var name = $("#PlaceTextbox").val();
-        var latitude = $("#LatitudeTextbox").val();
-        var longitude = $("#LongitudeTextbox").val();
-        var googleId = $("#GoogleIdTextbox").val();
-        var googleReferenceId = $("#GoogleReferenceIdTextbox").val();
-        var placeId = $("#PlaceIdTextbox").val();
+        var name = $("#Place").val();
+        var latitude = $("#Latitude").val();
+        var longitude = $("#Longitude").val();
+        var googleId = $("#GoogleId").val();
+        var googleReferenceId = $("#GoogleReferenceId").val();
+        var placeId = $("#PlaceId").val();
 
         var place = "{ Id:'" + placeId + "', Name:'" + escapeChars(name) + "', Latitude:'" + latitude + "', Longitude:'" + longitude + "', GoogleId:'" + googleId + "', GoogleReferenceId:'" + googleReferenceId + "'}"
         var sortOrder = [];
@@ -274,7 +279,7 @@
             success: function (data) {
                 $(".search .fbLoading").hide();
 
-                $("#PlaceIdTextbox").val(data.d.Id);
+                $("#PlaceId").val(data.d.Id);
 
                 var container = "http://dishwishes.blob.core.windows.net/places/" + data.d.Id + "_";
                 var list = "<ul>";
@@ -288,7 +293,7 @@
     }
 
     function CityAutoComplete() {
-        var city = $("#CityTextbox").val();
+        var city = $("#City").val();
         if (!city)
             return;
 
@@ -301,7 +306,7 @@
             success: function (data) {
                 var items = "";
                 $(data.d).each(function () {
-                    items += '<li onclick="$(\'#CityTextbox\').val(\'' + this + '\'); ChangeCity();" style="display:inherit;"><a>' + this + '</a></li>';
+                    items += '<li onclick="$(\'#City\').val(\'' + this + '\'); ChangeCity();" style="display:inherit;"><a>' + this + '</a></li>';
                 });
 
                 $(".results").html(items);
@@ -313,12 +318,15 @@
     function ChangeCity() {
         $(".resultsDiv").hide();
 
-        var address = $("#CityTextbox").val();
+        var address = $("#City").val();
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({ 'address': address }, function (results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
                 currentLat = results[0].geometry.location.lat();
                 currentLng = results[0].geometry.location.lng();
+
+                if (address.indexOf(",") > 0)
+                    $("#City").val(address.substr(0, address.indexOf(",")));
             }
         });
     }
@@ -341,16 +349,18 @@
             <a class="button" style="position:fixed; right:5%;" onclick="$('#PopupOverlay').hide();$('#Popup').hide();">Cancel</a>
         </div>
         <div class="search" >
-            <input type="text" class="field" id="PlaceTextbox" onkeyup="SearchPlaces();" PlaceHolder="Places">
+            <input type="text" class="field" id="Place" onkeyup="SearchPlaces();" PlaceHolder="Place">
             <a class="button" onclick="AddPlace(-1);">Search</a>
             <a class="button" onclick="SavePlace();">Save</a>
-            <input id="CityTextbox" type="text" value="Austin" onkeyup="CityAutoComplete(event);" PlaceHolder="City"/>
-            <input id="LatitudeTextbox" type="text" PlaceHolder="Latitude" />
-            <input id="LongitudeTextbox" type="text" PlaceHolder="Longitude" />
-            <input id="GoogleIdTextbox" type="text" PlaceHolder="GoogleId" />
-            <input id="GoogleReferenceIdTextbox" type="text" PlaceHolder="GoogleReferenceId" />
-            <input id="YelpIdTextbox" type="text" PlaceHolder="YelpId" />
-            <input id="PlaceIdTextbox" type="text" PlaceHolder="PlaceId" />
+            <input id="City" type="text" value="Austin" onkeyup="CityAutoComplete(event);" PlaceHolder="City"/>
+            <input id="Latitude" type="text" PlaceHolder="Latitude" />
+            <input id="Longitude" type="text" PlaceHolder="Longitude" />
+            <input id="GoogleId" type="text" PlaceHolder="GoogleId" />
+            <input id="GoogleReferenceId" type="text" PlaceHolder="GoogleReferenceId" />
+            <input id="YelpId" type="text" PlaceHolder="YelpId" />
+            <input id="Website" type="text" PlaceHolder="Website" />
+            <input id="Menu" type="text" PlaceHolder="Menu" />
+            <input id="PlaceId" type="text" PlaceHolder="PlaceId" />
             <div class="resultsDiv">
                 <ul class="results">
 

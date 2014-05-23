@@ -34,53 +34,64 @@ namespace DishWishWeb.Services
             List<Place> places = new List<Place>();
             for (int i = 0; i < numberToReturn; i++)
             {
-                if (!r.Contains("\"id\" : \"") || !r.Contains("\"lat\" : ") || !r.Contains("\"vicinity\" : \""))
+                if (!r.Contains("\"id\" : \"") || !r.Contains("\"lat\" : "))
                     break;
 
-                string p = r.Remove(0, r.IndexOf("\"lat\" : "));
-                p = p.Substring(0, p.IndexOf("\"vicinity\" : \""));
-
-                r = r.Remove(0, r.IndexOf("\"vicinity\" : \"") + 10);
-                if (p.Contains("\"price_level\" : 1,"))
-                    continue;
+                //if (p.Contains("\"price_level\" : 1,"))
+                //    continue;
 
                 Place place = new Place();
                 places.Add(place);
 
-                if (p.Contains("\"lat\" : "))
+                place.Id = "";
+
+                if (r.Contains("\"lat\" : "))
                 {
-                    p = p.Remove(0, p.IndexOf("\"lat\" : ") + 8);
-                    string lat = p.Substring(0, p.IndexOf(",")).Trim();
+                    r = r.Remove(0, r.IndexOf("\"lat\" : ") + 8);
+                    string lat = r.Substring(0, r.IndexOf(",")).Trim();
                     double d_lat;
                     if(double.TryParse(lat, out d_lat))
                         place.Latitude = d_lat;
                 }
 
-                if (p.Contains("\"lng\" : "))
+                if (r.Contains("\"lng\" : "))
                 {
-                    p = p.Remove(0, p.IndexOf("\"lng\" : ") + 8);
-                    string lng = p.Substring(0, p.IndexOf("}")).Trim();
+                    r = r.Remove(0, r.IndexOf("\"lng\" : ") + 8);
+                    string lng = r.Substring(0, r.IndexOf("}")).Trim();
                     double d_lng;
                     if (double.TryParse(lng, out d_lng))
                         place.Longitude = d_lng;
                 }
-                if (p.Contains("\"id\" : \""))
+                if (r.Contains("\"id\" : \""))
                 {
-                    p = p.Remove(0, p.IndexOf("\"id\" : \"") + 8);
-                    place.GoogleId = p.Substring(0, p.IndexOf("\","));
+                    r = r.Remove(0, r.IndexOf("\"id\" : \"") + 8);
+                    place.GoogleId = r.Substring(0, r.IndexOf("\","));
                 }
-                if (p.Contains("\"name\" : \""))
+                if (r.Contains("\"name\" : \""))
                 {
-                    p = p.Remove(0, p.IndexOf("\"name\" : \"") + 10);
-                    place.Name = p.Substring(0, p.IndexOf("\","));
-                }
-
-                if (p.Contains("\"reference\" : \""))
-                {
-                    p = p.Remove(0, p.IndexOf("\"reference\" : \"") + 15);
-                    place.GoogleReferenceId = p.Substring(0, p.IndexOf("\","));
+                    r = r.Remove(0, r.IndexOf("\"name\" : \"") + 10);
+                    place.Name = r.Substring(0, r.IndexOf("\","));
                 }
 
+                if (r.Contains("\"reference\" : \""))
+                {
+                    r = r.Remove(0, r.IndexOf("\"reference\" : \"") + 15);
+                    place.GoogleReferenceId = r.Substring(0, r.IndexOf("\","));
+                }
+                if (r.Contains("\"vicinity\" : \""))
+                {
+                    r = r.Remove(0, r.IndexOf("\"vicinity\" : \"") + 14);
+                    place.YelpId = r.Substring(0, r.IndexOf("\""));
+                    if (place.YelpId.Contains(","))
+                        place.YelpId = place.YelpId.Substring(0, place.YelpId.IndexOf(","));
+                }
+
+                if (r.Contains("\"geometry\" : "))
+                {
+                    r = r.Remove(0, r.IndexOf("\"geometry\" : ") + 10);
+                }
+                else
+                    break;
             }
 
             return places;
