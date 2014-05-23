@@ -224,7 +224,12 @@
         });
 
         //Validation
-        var sorted = sortOrder.sort(); 
+        var sorted = [];
+        $(sortOrder).each(function () {
+            sorted.push(this);
+        });
+
+        sorted.sort();
         for (var i = 0; i < sorted.length; i++) {
             if (sorted[i] != i) {
                 $(".results").html("<li><a>Sort Order Error</a></li>");
