@@ -70,7 +70,8 @@
 
     function AddPlace(id) {
 
-        var name = "";
+        var placeid = $("#" + id + "li a").parent().attr("placeid");
+        var name = $("#" + id + "li a")[0].innerHTML;
         var city = $("#CityTextbox").val();
         if (city.indexOf(",") > 0)
             city = city.substr(0, city.indexOf(","));
@@ -78,10 +79,19 @@
         if (id >= 0) {
 
             if ($("#" + id + "li a").parent().attr("yelpid")) {
-                //geocode
+                var address = $("#" + id + "li a").parent().attr("googlereferenceid");
+                var geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ 'address': address }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        var latitude = results[0].geometry.location.lat();
+                        var longitude = results[0].geometry.location.lng();
+
+                        fillTextboxes(id, latitude, longitude);
+                    }
+                });
             }
             else
-                fillTextboxes(id);
+                fillTextboxes(id, latitude, longitude);
         }
         else {
             name = $("#PlaceTextbox").val();
@@ -113,11 +123,9 @@
         $(".resultsDiv").hide();
     }
 
-    function fillTextboxes(id)
+    function fillTextboxes(id, latitude, longitude)
     {
         var name = $("#" + id + "li a")[0].innerHTML;
-        var latitude = $("#" + id + "li a").parent().attr("latitude");
-        var longitude = $("#" + id + "li a").parent().attr("longitude");
         var googleid = $("#" + id + "li a").parent().attr("googleid");
         var googlereferenceid = $("#" + id + "li a").parent().attr("googlereferenceid");
         var yelpid = $("#" + id + "li a").parent().attr("yelpid");
