@@ -29,6 +29,18 @@ namespace DishWishWeb
         }
 
         [WebMethod]
+        public static string GetWebsite(string yelpUrl)
+        {
+            return Place.GetWebsite(yelpUrl);
+        }
+
+        [WebMethod]
+        public static List<string> GetWebsiteImages(string url)
+        {
+            return Place.GetWebsiteImages(url);
+        }
+
+        [WebMethod]
         public static List<string> DownloadImages(List<string> urls)
         {
             return Place.DownloadImages(urls);

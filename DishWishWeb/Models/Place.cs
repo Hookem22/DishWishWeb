@@ -27,8 +27,10 @@ namespace DishWishWeb.Models
 
         public string YelpId { get; set; }
 
+        public string Website { get; set; }
+
         public static List<Place> GoogleSearch(string placeName, string city, string latitude, string longitude)
-        {   
+        {
             List<Place> googlePlaces = GooglePlacesService.GoogleSearchCity(placeName, latitude, longitude);
             List<Place> yelpPlaces = YelpService.Search(placeName, city);
             List<Place> places = new List<Place>();
@@ -44,12 +46,14 @@ namespace DishWishWeb.Models
                 if(p2 != null)
                 {
                     p1.YelpId = p2.YelpId;
+                    p1.Website = p2.Website;
                     yelpPlaces.Remove(p2);
                     places.Add(p1);
                 }
                 else
                 {
                     p1.YelpId = "";
+                    p1.Website = "";
                 }
             }
 
@@ -61,8 +65,7 @@ namespace DishWishWeb.Models
 
             places.AddRange(yelpPlaces);
 
-            //places.AddRange(Place.GetByName(placeName, latitude, longitude));
-
+            places.AddRange(Place.GetByName(placeName, latitude, longitude));
 
             return places;
         }
@@ -78,6 +81,16 @@ namespace DishWishWeb.Models
             urls.AddRange(GoogleImageService.GoogleImages(placeName + " yelp", city));
 
             return urls;
+        }
+
+        public static string GetWebsite(string yelpUrl)
+        {
+            return YelpService.GetWebsite(yelpUrl);
+        }
+
+        public static List<string> GetWebsiteImages(string url)
+        {
+            return GoogleImageService.WebsiteImages(url);
         }
 
         public static List<string> GoogleAutoComplete(string city)

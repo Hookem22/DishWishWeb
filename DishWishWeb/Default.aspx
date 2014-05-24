@@ -14,6 +14,7 @@
     var currentLng = -97.7534014;
     var imgWidth = 450;
     var cropping = false;
+    var places = [];
 
     function SearchPlaces() {
 
@@ -52,16 +53,21 @@
         }
 
         var items = "";
+        places = [];
         $(results).each(function (i) {
             var style = "";
-            if (this.GoogleId && this.YelpId)
-                style = "color:green;";
+            if (this.Id)
+                style = "font-weight:bold;font-size:12px;";
+            else if (this.GoogleId && this.YelpId)
+                style = "font-weight:bold;color:green;";
             else if (this.YelpId)
                 style = "color:#c41200;";
             else
                 style = "color:#4285f4";
 
-            items += '<li id="' + i + 'li" onclick="AddPlace(' + i + ');" placeid="' + this.Id + '" imagecount=' + this.ImageCount + ' latitude="' + this.Latitude + '" longitude="' + this.Longitude + '" googleid="' + this.GoogleId + '" googlereferenceid="' + this.GoogleReferenceId + '" yelpid="' + this.YelpId + '" ><a style="' + style + '" >' + this.Name + '</a></li>';
+            places.push(this);
+            items += '<li onclick="AddPlace(' + i + ');" ><a style="' + style + '" >' + this.Name + '</a></li>';
+
         });
 
         if (!items)
@@ -74,79 +80,130 @@
 
     function AddPlace(id) {
 
-        var placeid = $("#" + id + "li a").parent().attr("placeid");
-        var name = $("#" + id + "li a")[0].innerHTML;
-        var latitude = $("#" + id + "li a").parent().attr("latitude");
-        var longitude = $("#" + id + "li a").parent().attr("longitude");
+        var place = places[id];
+        console.log(place);
         var city = $("#City").val();
 
         if (id >= 0) {
 
-            if (!latitude) {
-                var address = $("#" + id + "li a").parent().attr("googlereferenceid");
+            if (!place.Latitude) {
+                var address = place.GoogleReferenceId;
                 var geocoder = new google.maps.Geocoder();
                 geocoder.geocode({ 'address': address }, function (results, status) {
                     if (status == google.maps.GeocoderStatus.OK) {
-                        latitude = results[0].geometry.location.lat();
-                        longitude = results[0].geometry.location.lng();
-                        $("#" + id + "li a").parent().attr("googlereferenceid", "");
+                        place.Latitude = results[0].geometry.location.lat();
+                        place.Longitude = results[0].geometry.location.lng();
+                        place.GoogleReferenceId = "";
 
-                        fillTextboxes(id, latitude, longitude);
+                        fillTextboxes(place);
                     }
                 });
             }
             else
-                fillTextboxes(id, latitude, longitude);
+                fillTextboxes(place);
         }
         else {
-            name = $("#Place").val();
+            place = {   GoogleId: $("#GoogleId").val(),
+                GoogleReferenceId: $("#GoogleReferenceId").val(),
+                Id: $("#PlaceId").val(),
+                ImageCount: 0,
+                Latitude: $("#Latitude").val(),
+                Longitude: $("#Longitude").val(),
+                Name: $("#Place").val(),
+                Website: $("#Website").val(),
+                YelpId: $("#YelpId").val(),
+            };
         }
 
-        if (placeid) {
-            var ct = $("#" + id + "li a").parent().attr("imagecount");
-            var container = "http://dishwishes.blob.core.windows.net/places/" + placeid + "_";
+        if (place.Id) {
+            var container = "http://dishwishes.blob.core.windows.net/places/" + place.Id + "_";
 
             var urls = [];
-            for(var i = 0; i < ct; i++) {
+            for(var i = 0; i < place.ImageCount; i++) {
                 urls.push(container + i + ".png");
             }
 
             DownloadImages(urls);
         }
         else {
-            $.ajax({
-                type: "POST",
-                url: "Default.aspx/GoogleImages",
-                data: "{placeName:'" + escapeChars(name) + "', city:'" + escapeChars(city) + "'}",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    PopulateImages(data.d);
-                }
-            });
+            $(".pickImages").html("");
+
+            $("#Website").val("");
+            $("#WebsiteLink").attr("href", "");
+            if (place.Website) {
+                $.ajax({
+                    type: "POST",
+                    url: "Default.aspx/GetWebsite",
+                    data: "{yelpUrl:'" + place.Website + "'}",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        $("#Website").val(data.d);
+                        $("#WebsiteLink").attr("href", data.d);
+
+                        if (data.d) {
+                            GetWebsiteImages(place.Name, city, data.d);
+                        }
+                    }
+                });
+            }
+            else
+            {
+                GoogleImages(place.Name, city)
+            }
         }
         $(".resultsDiv").hide();
     }
 
-    function fillTextboxes(id, latitude, longitude)
+    function fillTextboxes(place)
     {
-        var name = $("#" + id + "li a")[0].innerHTML;
-        var googleid = $("#" + id + "li a").parent().attr("googleid");
-        var googlereferenceid = $("#" + id + "li a").parent().attr("googlereferenceid");
-        var yelpid = $("#" + id + "li a").parent().attr("yelpid");
-        var placeid = $("#" + id + "li a").parent().attr("placeid");
+        $("#Place").val(place.Name);
+        $("#Latitude").val(place.Latitude);
+        $("#Longitude").val(place.Longitude);
+        if (place.GoogleId)
+            $("#GoogleId").val(place.GoogleId);
+        if (place.GoogleReferenceId)
+            $("#GoogleReferenceId").val(place.GoogleReferenceId);
+        if (place.YelpId)
+            $("#YelpId").val(place.YelpId);
+        if (place.PlaceId)
+            $("#PlaceId").val(place.PlaceId);
+    }
 
-        $("#Place").val(name);
-        $("#Latitude").val(latitude);
-        $("#Longitude").val(longitude);
-        if (googleid)
-            $("#GoogleId").val(googleid);
-        if (googlereferenceid)
-            $("#GoogleReferenceId").val(googlereferenceid);
-        if (yelpid)
-            $("#YelpId").val(yelpid);
-        if (placeid)
-            $("#PlaceId").val(placeid);
+    function GoogleImages(name, city) {
+        $.ajax({
+            type: "POST",
+            url: "Default.aspx/GoogleImages",
+            data: "{placeName:'" + escapeChars(name) + "', city:'" + escapeChars(city) + "'}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                PopulateImages(data.d);
+            }
+        });
+    }
+
+    function GetWebsiteImages(name, city, url) {
+        $.ajax({
+            type: "POST",
+            url: "Default.aspx/GetWebsiteImages",
+            data: "{url:'" + url + "'}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                var images = "";
+                $(data.d).each(function () {
+                    images += '<li><div><img src="' + this + '" onclick="togglePickedImage(this)"/></div></li>';
+                });
+
+                $(".pickImages").append(images);
+
+                $("#PopupOverlay").show();
+                $("#Popup").show();
+
+                GoogleImages(name, city);
+            }
+        });
     }
 
     function PopulateImages(results) {
@@ -155,7 +212,7 @@
             images += '<li><div><img src="' + this + '" onclick="togglePickedImage(this)"/></div></li>';
         });
 
-        $(".pickImages").html(images);
+        $(".pickImages").append(images);
 
         $("#PopupOverlay").show();
         $("#Popup").show();
@@ -331,6 +388,10 @@
         });
     }
 
+    $(document).keyup(function (e) {
+        if (e.keyCode == 27) { $('#PopupOverlay').hide(); $('#Popup').hide(); }   // esc
+    });
+
     function escapeChars(val) {
         val = val.replace(/'/g, "\\'");
         return val;
@@ -358,7 +419,7 @@
             <input id="GoogleId" type="text" PlaceHolder="GoogleId" />
             <input id="GoogleReferenceId" type="text" PlaceHolder="GoogleReferenceId" />
             <input id="YelpId" type="text" PlaceHolder="YelpId" />
-            <input id="Website" type="text" PlaceHolder="Website" />
+            <input id="Website" type="text" PlaceHolder="Website" /><a id="WebsiteLink" target="_blank"><img style="height: 22px;vertical-align: -6px;" src="http://www.artdocks.com/wp-content/uploads/2013/07/iconmonstr-arrow-28-icon.png" /></a>
             <input id="Menu" type="text" PlaceHolder="Menu" />
             <input id="PlaceId" type="text" PlaceHolder="PlaceId" />
             <div class="resultsDiv">
