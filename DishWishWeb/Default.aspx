@@ -81,7 +81,6 @@
     function AddPlace(id) {
 
         var place = places[id];
-        console.log(place);
         var city = $("#City").val();
 
         if (id >= 0) {
@@ -114,6 +113,8 @@
                 YelpId: $("#YelpId").val(),
             };
         }
+
+        $("#imagesDiv").html("");
 
         if (place.Id) {
             var container = "http://dishwishes.blob.core.windows.net/places/" + place.Id + "_";
@@ -246,13 +247,14 @@
             dataType: "json",
             success: function (data) {
 
-                var list = "<ul>";
+                var list = "";
+                var ct = $("#imagesDiv li").length;
                 $(data.d).each(function (i) {
-                    list += '<li><input type="text" style="width:50px;" value="' + i + '" /><br/><img src="' + this + '" style="width: ' + imgWidth + 'px;" /></li>';
+                    var j = ct + i;
+                    list += '<li><input type="text" style="width:50px;" value="' + j + '" /><br/><img src="' + this + '" style="width: ' + imgWidth + 'px;" /></li>';
                 });
-                list += "</ul>";
 
-                $("#imagesDiv").html(list);
+                $("#imagesDiv").append(list);
             }
         });
     }
@@ -349,6 +351,12 @@
         });
     }
 
+    function AddImageUrl() {
+        var img = [$("#ImageUrl").val()];
+
+        DownloadImages(img);
+    }
+
     function CityAutoComplete() {
         var city = $("#City").val();
         if (!city)
@@ -412,16 +420,24 @@
         <div class="search" >
             <input type="text" class="field" id="Place" onkeyup="SearchPlaces();" PlaceHolder="Place">
             <a class="button" onclick="AddPlace(-1);">Search</a>
-            <a class="button" onclick="SavePlace();">Save</a>
-            <input id="City" type="text" value="Austin" onkeyup="CityAutoComplete(event);" PlaceHolder="City"/>
-            <input id="Latitude" type="text" PlaceHolder="Latitude" />
-            <input id="Longitude" type="text" PlaceHolder="Longitude" />
-            <input id="GoogleId" type="text" PlaceHolder="GoogleId" />
-            <input id="GoogleReferenceId" type="text" PlaceHolder="GoogleReferenceId" />
-            <input id="YelpId" type="text" PlaceHolder="YelpId" />
-            <input id="Website" type="text" PlaceHolder="Website" /><a id="WebsiteLink" target="_blank"><img style="height: 22px;vertical-align: -6px;" src="http://www.artdocks.com/wp-content/uploads/2013/07/iconmonstr-arrow-28-icon.png" /></a>
-            <input id="Menu" type="text" PlaceHolder="Menu" />
+            <a class="button" onclick="SavePlace();">Save</a><br />
+            <input id="City" type="text" value="Austin" onkeyup="CityAutoComplete(event);" PlaceHolder="City"/><br />
+            <input id="Latitude" type="text" PlaceHolder="Latitude" /><br />
+            <input id="Longitude" type="text" PlaceHolder="Longitude" /><br />
+            <input id="GoogleId" type="text" PlaceHolder="GoogleId" /><br />
+            <input id="GoogleReferenceId" type="text" PlaceHolder="GoogleReferenceId" /><br />
+            <input id="YelpId" type="text" PlaceHolder="YelpId" /><br />
+            <input id="Website" type="text" PlaceHolder="Website" /><a id="WebsiteLink" target="_blank"><img style="height: 22px;vertical-align: -6px;" src="http://www.artdocks.com/wp-content/uploads/2013/07/iconmonstr-arrow-28-icon.png" /></a><br />
+            <input id="Menu" type="text" style="width:220px;" PlaceHolder="Menu" />
+            <input id="LunchMenu" type="text" style="width:220px;" PlaceHolder="Lunch Menu" />
+            <input id="BrunchMenu" type="text" style="width:220px;" PlaceHolder="Brunch Menu" />
+            <input id="DrinkMenu" type="text" style="width:220px;" PlaceHolder="Drink Menu" />
+            <input id="HappyHourMenu" type="text" style="width:220px;" PlaceHolder="Happy Hour Menu" />
+            <br />
             <input id="PlaceId" type="text" PlaceHolder="PlaceId" />
+            <br /><br />
+            <input type="text" id="ImageUrl" PlaceHolder="Image Url">
+            <a class="button" onclick="AddImageUrl();">Add Image</a>
             <div class="resultsDiv">
                 <ul class="results">
 
@@ -433,8 +449,10 @@
         </div>
 
         <br />
-        <div id="imagesDiv" >
+        <div>
+            <ul id="imagesDiv">
 
+            </ul>
         </div>
     </div>
     </form>
