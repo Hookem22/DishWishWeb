@@ -94,24 +94,15 @@
                         place.Longitude = results[0].geometry.location.lng();
                         place.GoogleReferenceId = "";
 
-                        fillTextboxes(place);
+                        SetPlace(place);
                     }
                 });
             }
             else
-                fillTextboxes(place);
+                SetPlace(place);
         }
         else {
-            place = {   GoogleId: $("#GoogleId").val(),
-                GoogleReferenceId: $("#GoogleReferenceId").val(),
-                Id: $("#PlaceId").val(),
-                ImageCount: 0,
-                Latitude: $("#Latitude").val(),
-                Longitude: $("#Longitude").val(),
-                Name: $("#Place").val(),
-                Website: $("#Website").val(),
-                YelpId: $("#YelpId").val(),
-            };
+            place = GetPlace();
         }
 
         $("#imagesDiv").html("");
@@ -154,21 +145,6 @@
             }
         }
         $(".resultsDiv").hide();
-    }
-
-    function fillTextboxes(place)
-    {
-        $("#Place").val(place.Name);
-        $("#Latitude").val(place.Latitude);
-        $("#Longitude").val(place.Longitude);
-        if (place.GoogleId)
-            $("#GoogleId").val(place.GoogleId);
-        if (place.GoogleReferenceId)
-            $("#GoogleReferenceId").val(place.GoogleReferenceId);
-        if (place.YelpId)
-            $("#YelpId").val(place.YelpId);
-        if (place.PlaceId)
-            $("#PlaceId").val(place.PlaceId);
     }
 
     function GoogleImages(name, city) {
@@ -299,14 +275,8 @@
         $(".search .fbLoading").show();
         $(".resultsDiv").hide();
 
-        var name = $("#Place").val();
-        var latitude = $("#Latitude").val();
-        var longitude = $("#Longitude").val();
-        var googleId = $("#GoogleId").val();
-        var googleReferenceId = $("#GoogleReferenceId").val();
-        var placeId = $("#PlaceId").val();
+        var place = GetPlace();
 
-        var place = "{ Id:'" + placeId + "', Name:'" + escapeChars(name) + "', Latitude:'" + latitude + "', Longitude:'" + longitude + "', GoogleId:'" + googleId + "', GoogleReferenceId:'" + googleReferenceId + "'}"
         var sortOrder = [];
         $("#imagesDiv li input[type='text']").each(function () {
             sortOrder.push($(this).val());
@@ -328,17 +298,16 @@
             }
         }
 
-
         $.ajax({
             type: "POST",
             url: "Default.aspx/SavePlace",
-            data: "{place:" + place + ", sortOrder:" + JSON.stringify(sortOrder) + "}",
+            data: "{place:" + JSON.stringify(place) + ", sortOrder:" + JSON.stringify(sortOrder) + "}",
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data) {
                 $(".search .fbLoading").hide();
 
-                $("#PlaceId").val(data.d.Id);
+                $("#Id").val(data.d.Id);
 
                 var container = "http://dishwishes.blob.core.windows.net/places/" + data.d.Id + "_";
                 var list = "<ul>";
@@ -396,6 +365,45 @@
         });
     }
 
+    function GetPlace()
+    {
+        var imageCount = $("#imagesDiv li input[type='text']").length;
+        var place = {   
+            Id: $("#Id").val(),
+            Name: $("#Place").val(),
+            GoogleId: $("#GoogleId").val(),
+            GoogleReferenceId: $("#GoogleReferenceId").val(),
+            YelpId: $("#YelpId").val(),
+            ImageCount: imageCount,
+            Latitude: $("#Latitude").val(),
+            Longitude: $("#Longitude").val(),
+            Website: $("#Website").val(),
+            Menu: $("#Menu").val(),
+            BrunchMenu: $("#BrunchMenu").val(),
+            LunchMenu: $("#LunchMenu").val(),
+            DrinkMenu: $("#DrinkMenu").val(),
+            HappyHourMenu: $("#HappyHourMenu").val()
+        };
+        return place;
+    }
+
+    function SetPlace(place)
+    {
+        $("#Id").val(place.Id);
+        $("#Place").val(place.Name);
+        $("#GoogleId").val(place.GoogleId);
+        $("#GoogleReferenceId").val(place.GoogleReferenceId);
+        $("#YelpId").val(place.YelpId);
+        $("#Latitude").val(place.Latitude);
+        $("#Longitude").val(place.Longitude);
+        $("#Website").val(place.Website);
+        $("#Menu").val(place.Menu);
+        $("#BrunchMenu").val(place.BrunchMenu);
+        $("#LunchMenu").val(place.LunchMenu);
+        $("#DrinkMenu").val(place.DrinkMenu);
+        $("#HappyHourMenu").val(place.HappyHourMenu);
+    }
+
     $(document).keyup(function (e) {
         if (e.keyCode == 27) { $('#PopupOverlay').hide(); $('#Popup').hide(); }   // esc
     });
@@ -434,7 +442,7 @@
             <input id="DrinkMenu" type="text" style="width:220px;" PlaceHolder="Drink Menu" />
             <input id="HappyHourMenu" type="text" style="width:220px;" PlaceHolder="Happy Hour Menu" />
             <br />
-            <input id="PlaceId" type="text" PlaceHolder="PlaceId" />
+            <input id="Id" type="text" PlaceHolder="PlaceId" />
             <br /><br />
             <input type="text" id="ImageUrl" PlaceHolder="Image Url">
             <a class="button" onclick="AddImageUrl();">Add Image</a>

@@ -29,6 +29,16 @@ namespace DishWishWeb.Models
 
         public string Website { get; set; }
 
+        public string Menu { get; set; }
+
+        public string LunchMenu { get; set; }
+
+        public string BrunchMenu { get; set; }
+
+        public string DrinkMenu { get; set; }
+
+        public string HappyHourMenu { get; set; }
+
         public static List<Place> GoogleSearch(string placeName, string city, string latitude, string longitude)
         {
             List<Place> googlePlaces = GooglePlacesService.GoogleSearchCity(placeName, latitude, longitude);
