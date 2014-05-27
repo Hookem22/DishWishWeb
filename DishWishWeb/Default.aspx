@@ -326,6 +326,7 @@
         });
 
         urls.push($("#ImageUrl").val());
+        $("#ImageUrl").val("");
 
         $("#imagesDiv").html("");
         DownloadImages(urls);
