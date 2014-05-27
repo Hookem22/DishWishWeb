@@ -107,7 +107,7 @@
 
         $("#imagesDiv").html("");
 
-        if (place.Id) {
+        if (place.Id && id >= 0) {
             var container = "http://dishwishes.blob.core.windows.net/places/" + place.Id + "_";
 
             var urls = [];
@@ -203,7 +203,6 @@
 
         $("#PopupOverlay").hide();
         $("#Popup").hide();
-
 
         var urls = [];
         $(".picked").each(function () {
@@ -321,9 +320,15 @@
     }
 
     function AddImageUrl() {
-        var img = [$("#ImageUrl").val()];
+        var urls = [];
+        $("#imagesDiv img").each(function () {
+            urls.push($(this).attr("src"));
+        });
 
-        DownloadImages(img);
+        urls.push($("#ImageUrl").val());
+
+        $("#imagesDiv").html("");
+        DownloadImages(urls);
     }
 
     function CityAutoComplete() {

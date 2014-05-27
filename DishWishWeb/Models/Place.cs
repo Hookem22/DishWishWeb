@@ -13,6 +13,8 @@ namespace DishWishWeb.Models
 
         }
 
+        #region Properties
+
         public string Name { get; set; }
 
         public int ImageCount { get; set; }
@@ -38,6 +40,8 @@ namespace DishWishWeb.Models
         public string DrinkMenu { get; set; }
 
         public string HappyHourMenu { get; set; }
+
+        #endregion
 
         public static List<Place> GoogleSearch(string placeName, string city, string latitude, string longitude)
         {
