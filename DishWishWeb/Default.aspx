@@ -176,7 +176,7 @@
                 $(".pickImages").append(images);
 
                 $("#PopupOverlay").show();
-                $("#Popup").show();
+                $("#ImagePopup").show();
 
                 GoogleImages(name, city);
             }
@@ -202,7 +202,7 @@
     function AddImages() {
 
         $("#PopupOverlay").hide();
-        $("#Popup").hide();
+        $("#ImagePopup").hide();
 
         var urls = [];
         $(".picked").each(function () {
@@ -226,7 +226,7 @@
                 var ct = $("#imagesDiv li").length;
                 $(data.d).each(function (i) {
                     var j = ct + i;
-                    list += '<li><input type="text" style="width:50px;" value="' + j + '" /><br/><img src="' + this + '" style="width: ' + imgWidth + 'px;" /></li>';
+                    list += '<li><input type="text" style="width:50px;" value="' + j + '" /><a onclick="DeleteImage(' + j + ')" style="margin-left:6px;" >Delete</a><br/><img src="' + this + '" style="width: ' + imgWidth + 'px;" /></li>';
                 });
 
                 $("#imagesDiv").append(list);
@@ -269,6 +269,39 @@
         });
     });
 
+    function AddImageUrl() {
+        var urls = [];
+        $("#imagesDiv img").each(function () {
+            urls.push($(this).attr("src"));
+        });
+
+        urls.push($("#ImageUrl").val());
+        $("#ImageUrl").val("");
+
+        $("#imagesDiv").html("");
+        DownloadImages(urls);
+    }
+
+    function DeleteImage(id) {
+
+        var urls = [];
+        $("#imagesDiv img").each(function (i) {
+            if(id != i)
+                urls.push($(this).attr("src"));
+        });
+
+        $("#imagesDiv").html("");
+        DownloadImages(urls);
+    }
+
+    //Menu Edit
+    $(document).bind('click', function () {
+        $('.menuArrow').bind('click', function () {
+            var menuType = $(this).attr("title");
+            $("#" + menuType).val(menuType + ".png");
+        });
+    });
+
     function SavePlace()
     {
         $(".search .fbLoading").show();
@@ -306,30 +339,20 @@
             success: function (data) {
                 $(".search .fbLoading").hide();
 
+                SetPlace(data.d);
+
                 $("#Id").val(data.d.Id);
 
                 var container = "http://dishwishes.blob.core.windows.net/places/" + data.d.Id + "_";
                 var list = "<ul>";
-                for(var i = 0, ii = data.d.ImageCount; i < ii; i++) {
-                    list += '<li><input type="text" style="width:50px;" value="' + i + '" /><br/><img src="' + container + i + '.png" style="width: ' + imgWidth + 'px;" /></li>';                  
+                for (var i = 0, ii = data.d.ImageCount; i < ii; i++) {
+                    var wd = imgWidth / 2;
+                    list += '<li><img src="' + container + i + '.png" style="width: ' + wd + 'px;" /></li>';                  
                 }
                 list += "</ul>";
                 $("#imagesDiv").html(list);
             }
         });
-    }
-
-    function AddImageUrl() {
-        var urls = [];
-        $("#imagesDiv img").each(function () {
-            urls.push($(this).attr("src"));
-        });
-
-        urls.push($("#ImageUrl").val());
-        $("#ImageUrl").val("");
-
-        $("#imagesDiv").html("");
-        DownloadImages(urls);
     }
 
     function CityAutoComplete() {
@@ -403,6 +426,7 @@
         $("#Latitude").val(place.Latitude);
         $("#Longitude").val(place.Longitude);
         $("#Website").val(place.Website);
+        $("#WebsiteLink").attr("href", place.Website);
         $("#Menu").val(place.Menu);
         $("#BrunchMenu").val(place.BrunchMenu);
         $("#LunchMenu").val(place.LunchMenu);
@@ -411,7 +435,7 @@
     }
 
     $(document).keyup(function (e) {
-        if (e.keyCode == 27) { $('#PopupOverlay').hide(); $('#Popup').hide(); }   // esc
+        if (e.keyCode == 27) { $('#PopupOverlay').hide(); $('#ImagePopup').hide(); $('#MenuPopup').hide(); }   // esc
     });
 
     function escapeChars(val) {
@@ -424,12 +448,12 @@
 <body>
     <form id="form1" runat="server">
         <div id="PopupOverlay" style="display:none;" ></div>
-        <div id="Popup" class="PlacePopup" style="display:none;">
+        <div id="ImagePopup" class="Popup" style="display:none;">
             <ul class="pickImages">
 
             </ul>
             <a class="button" style="position:fixed; right:5%;margin-right:80px;" onclick="AddImages();">Done</a>
-            <a class="button" style="position:fixed; right:5%;" onclick="$('#PopupOverlay').hide();$('#Popup').hide();">Cancel</a>
+            <a class="button" style="position:fixed; right:5%;" onclick="$('#PopupOverlay').hide();$('#ImagePopup').hide();">Cancel</a>
         </div>
         <div class="search" >
             <input type="text" class="field" id="Place" onkeyup="SearchPlaces();" PlaceHolder="Place">
@@ -441,12 +465,12 @@
             <input id="GoogleId" type="text" PlaceHolder="GoogleId" /><br />
             <input id="GoogleReferenceId" type="text" PlaceHolder="GoogleReferenceId" /><br />
             <input id="YelpId" type="text" PlaceHolder="YelpId" /><br />
-            <input id="Website" type="text" PlaceHolder="Website" /><a id="WebsiteLink" target="_blank"><img style="height: 22px;vertical-align: -6px;" src="http://www.artdocks.com/wp-content/uploads/2013/07/iconmonstr-arrow-28-icon.png" /></a><br />
-            <input id="Menu" type="text" style="width:220px;" PlaceHolder="Menu" />
-            <input id="LunchMenu" type="text" style="width:220px;" PlaceHolder="Lunch Menu" />
-            <input id="BrunchMenu" type="text" style="width:220px;" PlaceHolder="Brunch Menu" />
-            <input id="DrinkMenu" type="text" style="width:220px;" PlaceHolder="Drink Menu" />
-            <input id="HappyHourMenu" type="text" style="width:220px;" PlaceHolder="Happy Hour Menu" />
+            <input id="Website" type="text" PlaceHolder="Website" /><a id="WebsiteLink" target="_blank" class="arrowLink"></a><br />
+            <input id="Menu" type="text" style="width:200px;" PlaceHolder="Menu" /><a class="arrowLink menuArrow" title="Menu"></a>
+            <input id="LunchMenu" type="text" style="width:200px;" PlaceHolder="Lunch Menu" /><a class="arrowLink menuArrow" title="LunchMenu"></a>
+            <input id="BrunchMenu" type="text" style="width:200px;" PlaceHolder="Brunch Menu" /><a class="arrowLink menuArrow" title="BrunchMenu"></a>
+            <input id="DrinkMenu" type="text" style="width:200px;" PlaceHolder="Drink Menu" /><a class="arrowLink menuArrow" title="DrinkMenu"></a>
+            <input id="HappyHourMenu" type="text" style="width:200px;" PlaceHolder="Happy Hour Menu" /><a class="arrowLink menuArrow" title="HappyHourMenu"></a>
             <br />
             <input id="Id" type="text" PlaceHolder="PlaceId" />
             <br /><br />

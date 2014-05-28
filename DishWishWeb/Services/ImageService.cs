@@ -34,11 +34,11 @@ namespace DishWishWeb.Services
             {
                 try
                 {
-                    DirectoryInfo folder = new DirectoryInfo(tempFolder);
-                    foreach (FileInfo file in folder.GetFiles())
-                    {
-                        file.Delete();
-                    }
+                    //DirectoryInfo folder = new DirectoryInfo(tempFolder);
+                    //foreach (FileInfo file in folder.GetFiles())
+                    //{
+                    //    file.Delete();
+                    //}
                 }
                 catch { }
             }
@@ -71,6 +71,14 @@ namespace DishWishWeb.Services
             }
         }
 
+        public void DownloadLocal(string url)
+        {
+            Delete(currentFile);
+            using (WebClient client = new WebClient())
+            {
+                client.DownloadFile(Path.Combine(tempFolder, url), currentFile);
+            }
+        }
 
         public void ResizeImage()
         {

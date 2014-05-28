@@ -115,7 +115,6 @@ namespace DishWishWeb.Models
         public static List<string> DownloadImages(List<string> urls)
         {
             BlobService blob = new BlobService("places");
-            blob.ClearTmpBlobs();
 
             List<string> blobUrls = new List<string>();
             for(int i = 0; i < urls.Count; i++)
@@ -146,9 +145,60 @@ namespace DishWishWeb.Models
         public void Save(List<int> sortOrder)
         {
             Name = Name.Replace("&amp;", "&");            
-            ImageCount = sortOrder.Count;
+            ImageCount = sortOrder.Count;    
+            
             base.Save();
 
+            SaveMenus(); 
+            SaveImages(sortOrder);
+        }
+
+        private void SaveMenus()
+        {
+            //TODO: Change back to awesome screenshot, scrape the page
+            
+            BlobService blob = new BlobService("places");
+            ImageService service = new ImageService();
+            
+            if (!string.IsNullOrEmpty(Menu))
+            {
+                string blobName = string.Format("{0}_{1}.png", Id, "Menu");
+                service.DownloadLocal(Menu);
+                blob.CreateBlob(blobName);
+                Menu = string.Format("{0}{1}", blob.container, blobName);
+            }
+            if (!string.IsNullOrEmpty(LunchMenu))
+            {
+                string blobName = string.Format("{0}_{1}.png", Id, "LunchMenu");
+                service.DownloadLocal(LunchMenu);
+                blob.CreateBlob(blobName);
+                Menu = string.Format("{0}{1}", blob.container, blobName);
+            }
+            if (!string.IsNullOrEmpty(BrunchMenu))
+            {
+                string blobName = string.Format("{0}_{1}.png", Id, "BrunchMenu");
+                service.DownloadLocal(BrunchMenu);
+                blob.CreateBlob(blobName);
+                Menu = string.Format("{0}{1}", blob.container, blobName);
+            }
+            if (!string.IsNullOrEmpty(DrinkMenu))
+            {
+                string blobName = string.Format("{0}_{1}.png", Id, "DrinkMenu");
+                service.DownloadLocal(DrinkMenu);
+                blob.CreateBlob(blobName);
+                Menu = string.Format("{0}{1}", blob.container, blobName);
+            }
+            if (!string.IsNullOrEmpty(HappyHourMenu))
+            {
+                string blobName = string.Format("{0}_{1}.png", Id, "HappyHourMenu");
+                service.DownloadLocal(HappyHourMenu);
+                blob.CreateBlob(blobName);
+                Menu = string.Format("{0}{1}", blob.container, blobName);
+            }
+        }
+
+        private void SaveImages(List<int> sortOrder)
+        {
             BlobService blob = new BlobService("places");
             ImageService service = new ImageService();
             for (int i = 0, ii = sortOrder.Count; i < ii; i++)

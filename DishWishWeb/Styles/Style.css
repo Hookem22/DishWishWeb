@@ -31,7 +31,7 @@ input[type="text"]
     height: 100%;
     z-index: 20000;
 }
-#Popup
+.Popup
 {
     float: left; 
     width: 95%;
@@ -198,7 +198,23 @@ a.button:hover{
     margin: 5px;
     float: left;
 }
+#imagesDiv li a:hover
+{
+    text-decoration: underline;
+    cursor: pointer;
+}
 #imagesDiv li img
 {
     /*height: 250px;*/
+}
+.arrowLink
+{
+    display: inline-block;
+    height: 22px;
+    width: 22px;
+    vertical-align: -6px;
+    background-image:url(http://www.artdocks.com/wp-content/uploads/2013/07/iconmonstr-arrow-28-icon.png);
+    background-size: 22px auto;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
