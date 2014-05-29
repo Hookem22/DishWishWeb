@@ -149,7 +149,9 @@ namespace DishWishWeb.Models
             
             base.Save();
 
-            SaveMenus(); 
+            SaveMenus();
+            base.Save(); //Save new menu names
+
             SaveImages(sortOrder);
         }
 
@@ -160,40 +162,45 @@ namespace DishWishWeb.Models
             BlobService blob = new BlobService("places");
             ImageService service = new ImageService();
             
-            if (!string.IsNullOrEmpty(Menu))
+            if (!string.IsNullOrEmpty(Menu) && Menu.Contains("awesomescreenshot.com"))
             {
+                service.Download(service.GetMenuImageFromAwesomeScreenshot(Menu));
+                
                 string blobName = string.Format("{0}_{1}.png", Id, "Menu");
-                service.DownloadLocal(Menu);
                 blob.CreateBlob(blobName);
                 Menu = string.Format("{0}{1}", blob.container, blobName);
             }
-            if (!string.IsNullOrEmpty(LunchMenu))
+            if (!string.IsNullOrEmpty(LunchMenu) && Menu.Contains("awesomescreenshot.com"))
             {
+                service.Download(service.GetMenuImageFromAwesomeScreenshot(LunchMenu));
+                
                 string blobName = string.Format("{0}_{1}.png", Id, "LunchMenu");
-                service.DownloadLocal(LunchMenu);
                 blob.CreateBlob(blobName);
-                Menu = string.Format("{0}{1}", blob.container, blobName);
+                LunchMenu = string.Format("{0}{1}", blob.container, blobName);
             }
-            if (!string.IsNullOrEmpty(BrunchMenu))
+            if (!string.IsNullOrEmpty(BrunchMenu) && Menu.Contains("awesomescreenshot.com"))
             {
+                service.Download(service.GetMenuImageFromAwesomeScreenshot(BrunchMenu));
+                
                 string blobName = string.Format("{0}_{1}.png", Id, "BrunchMenu");
-                service.DownloadLocal(BrunchMenu);
                 blob.CreateBlob(blobName);
-                Menu = string.Format("{0}{1}", blob.container, blobName);
+                BrunchMenu = string.Format("{0}{1}", blob.container, blobName);
             }
-            if (!string.IsNullOrEmpty(DrinkMenu))
+            if (!string.IsNullOrEmpty(DrinkMenu) && Menu.Contains("awesomescreenshot.com"))
             {
+                service.Download(service.GetMenuImageFromAwesomeScreenshot(DrinkMenu));
+                
                 string blobName = string.Format("{0}_{1}.png", Id, "DrinkMenu");
-                service.DownloadLocal(DrinkMenu);
                 blob.CreateBlob(blobName);
-                Menu = string.Format("{0}{1}", blob.container, blobName);
+                DrinkMenu = string.Format("{0}{1}", blob.container, blobName);
             }
-            if (!string.IsNullOrEmpty(HappyHourMenu))
+            if (!string.IsNullOrEmpty(HappyHourMenu) && Menu.Contains("awesomescreenshot.com"))
             {
+                service.Download(service.GetMenuImageFromAwesomeScreenshot(HappyHourMenu));
+                
                 string blobName = string.Format("{0}_{1}.png", Id, "HappyHourMenu");
-                service.DownloadLocal(HappyHourMenu);
                 blob.CreateBlob(blobName);
-                Menu = string.Format("{0}{1}", blob.container, blobName);
+                HappyHourMenu = string.Format("{0}{1}", blob.container, blobName);
             }
         }
 

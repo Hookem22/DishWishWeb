@@ -30,18 +30,18 @@ namespace DishWishWeb.Services
             {
                 Directory.CreateDirectory(tempFolder);
             }
-            else
-            {
-                try
-                {
-                    //DirectoryInfo folder = new DirectoryInfo(tempFolder);
-                    //foreach (FileInfo file in folder.GetFiles())
-                    //{
-                    //    file.Delete();
-                    //}
-                }
-                catch { }
-            }
+            //else
+            //{
+            //    try
+            //    {
+            //        DirectoryInfo folder = new DirectoryInfo(tempFolder);
+            //        foreach (FileInfo file in folder.GetFiles())
+            //        {
+            //            file.Delete();
+            //        }
+            //    }
+            //    catch { }
+            //}
         }
         
         public void SaveTmpImage(string url)
@@ -71,14 +71,14 @@ namespace DishWishWeb.Services
             }
         }
 
-        public void DownloadLocal(string url)
-        {
-            Delete(currentFile);
-            using (WebClient client = new WebClient())
-            {
-                client.DownloadFile(Path.Combine(tempFolder, url), currentFile);
-            }
-        }
+        //public void DownloadLocal(string url)
+        //{
+        //    Delete(currentFile);
+        //    using (WebClient client = new WebClient())
+        //    {
+        //        client.DownloadFile(Path.Combine(tempFolder, url), currentFile);
+        //    }
+        //}
 
         public void ResizeImage()
         {
@@ -217,9 +217,21 @@ namespace DishWishWeb.Services
             catch { }
         }
 
-        public void Upload(Image img)
+        public string GetMenuImageFromAwesomeScreenshot(string url)
         {
+            string response = WebService.GetResponse(url);
+            string menuImg = "";
+
+            if (response.Contains("<img id=\"screenshot\""))
+            {
+                response = response.Substring(response.IndexOf("<img id=\"screenshot\""));
+                response = response.Substring(response.IndexOf("src") + 5);
+
+                menuImg = response.Remove(response.IndexOf("\""));
+            }
+            return menuImg;
 
         }
+
     }
 }
