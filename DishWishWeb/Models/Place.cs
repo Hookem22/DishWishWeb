@@ -168,7 +168,7 @@ namespace DishWishWeb.Models
                 blob.CreateBlob(blobName);
                 Menu = string.Format("{0}{1}", blob.container, blobName);
             }
-            if (!string.IsNullOrEmpty(LunchMenu) && Menu.Contains("awesomescreenshot.com"))
+            if (!string.IsNullOrEmpty(LunchMenu) && LunchMenu.Contains("awesomescreenshot.com"))
             {
                 service.SaveMenu(LunchMenu);
                 
@@ -176,7 +176,7 @@ namespace DishWishWeb.Models
                 blob.CreateBlob(blobName);
                 LunchMenu = string.Format("{0}{1}", blob.container, blobName);
             }
-            if (!string.IsNullOrEmpty(BrunchMenu) && Menu.Contains("awesomescreenshot.com"))
+            if (!string.IsNullOrEmpty(BrunchMenu) && BrunchMenu.Contains("awesomescreenshot.com"))
             {
                 service.SaveMenu(BrunchMenu);
                 
@@ -184,7 +184,7 @@ namespace DishWishWeb.Models
                 blob.CreateBlob(blobName);
                 BrunchMenu = string.Format("{0}{1}", blob.container, blobName);
             }
-            if (!string.IsNullOrEmpty(DrinkMenu) && Menu.Contains("awesomescreenshot.com"))
+            if (!string.IsNullOrEmpty(DrinkMenu) && DrinkMenu.Contains("awesomescreenshot.com"))
             {
                 service.SaveMenu(DrinkMenu);
                 
@@ -192,7 +192,7 @@ namespace DishWishWeb.Models
                 blob.CreateBlob(blobName);
                 DrinkMenu = string.Format("{0}{1}", blob.container, blobName);
             }
-            if (!string.IsNullOrEmpty(HappyHourMenu) && Menu.Contains("awesomescreenshot.com"))
+            if (!string.IsNullOrEmpty(HappyHourMenu) && HappyHourMenu.Contains("awesomescreenshot.com"))
             {
                 service.SaveMenu(HappyHourMenu);
                 
