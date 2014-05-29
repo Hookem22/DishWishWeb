@@ -298,7 +298,7 @@
     $(document).bind('click', function () {
         $('.menuArrow').bind('click', function () {
             var menuType = $(this).attr("title");
-            $("#" + menuType).val(menuType + ".png");
+            //$("#" + menuType).val(menuType + ".png");
         });
     });
 

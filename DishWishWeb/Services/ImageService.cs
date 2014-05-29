@@ -62,6 +62,13 @@ namespace DishWishWeb.Services
             SetCurrentImage();
         }
 
+        public void SaveMenu(string url)
+        {
+            Download(GetMenuImageFromAwesomeScreenshot(url));
+            ResizeImageForWidth();
+            SetCurrentImage();
+        }
+
         public void Download(string url)
         {
             Delete(currentFile);
@@ -194,6 +201,34 @@ namespace DishWishWeb.Services
                 string desc = ex.ToString();
             }
             
+        }
+
+        public void ResizeImageForWidth()
+        {
+            try
+            {
+                using (System.Drawing.Image original = System.Drawing.Image.FromFile(currentFile))
+                {
+
+                    double ratio = (double)fullImageWidth / (double)original.Width;
+                    double d_newHeight = (double)original.Height * ratio;
+                    int newHeight = (int)d_newHeight;
+                    int newWidth = fullImageWidth;
+
+                    using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(newWidth, newHeight))
+                    {
+                        using (System.Drawing.Graphics gr = System.Drawing.Graphics.FromImage(newPic))
+                        {
+                            gr.DrawImage(original, 0, 0, (newWidth), (newHeight));
+                            newPic.Save(tempFile, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string desc = ex.ToString();
+            }
         }
 
         private void SetCurrentImage()

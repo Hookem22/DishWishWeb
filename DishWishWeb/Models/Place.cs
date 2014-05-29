@@ -157,22 +157,20 @@ namespace DishWishWeb.Models
 
         private void SaveMenus()
         {
-            //TODO: Change back to awesome screenshot, scrape the page
-            
             BlobService blob = new BlobService("places");
             ImageService service = new ImageService();
             
             if (!string.IsNullOrEmpty(Menu) && Menu.Contains("awesomescreenshot.com"))
             {
-                service.Download(service.GetMenuImageFromAwesomeScreenshot(Menu));
-                
+                service.SaveMenu(Menu);
+
                 string blobName = string.Format("{0}_{1}.png", Id, "Menu");
                 blob.CreateBlob(blobName);
                 Menu = string.Format("{0}{1}", blob.container, blobName);
             }
             if (!string.IsNullOrEmpty(LunchMenu) && Menu.Contains("awesomescreenshot.com"))
             {
-                service.Download(service.GetMenuImageFromAwesomeScreenshot(LunchMenu));
+                service.SaveMenu(LunchMenu);
                 
                 string blobName = string.Format("{0}_{1}.png", Id, "LunchMenu");
                 blob.CreateBlob(blobName);
@@ -180,7 +178,7 @@ namespace DishWishWeb.Models
             }
             if (!string.IsNullOrEmpty(BrunchMenu) && Menu.Contains("awesomescreenshot.com"))
             {
-                service.Download(service.GetMenuImageFromAwesomeScreenshot(BrunchMenu));
+                service.SaveMenu(BrunchMenu);
                 
                 string blobName = string.Format("{0}_{1}.png", Id, "BrunchMenu");
                 blob.CreateBlob(blobName);
@@ -188,7 +186,7 @@ namespace DishWishWeb.Models
             }
             if (!string.IsNullOrEmpty(DrinkMenu) && Menu.Contains("awesomescreenshot.com"))
             {
-                service.Download(service.GetMenuImageFromAwesomeScreenshot(DrinkMenu));
+                service.SaveMenu(DrinkMenu);
                 
                 string blobName = string.Format("{0}_{1}.png", Id, "DrinkMenu");
                 blob.CreateBlob(blobName);
@@ -196,7 +194,7 @@ namespace DishWishWeb.Models
             }
             if (!string.IsNullOrEmpty(HappyHourMenu) && Menu.Contains("awesomescreenshot.com"))
             {
-                service.Download(service.GetMenuImageFromAwesomeScreenshot(HappyHourMenu));
+                service.SaveMenu(HappyHourMenu);
                 
                 string blobName = string.Format("{0}_{1}.png", Id, "HappyHourMenu");
                 blob.CreateBlob(blobName);
