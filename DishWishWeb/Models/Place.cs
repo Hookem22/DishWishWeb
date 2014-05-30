@@ -84,6 +84,13 @@ namespace DishWishWeb.Models
             return places;
         }
 
+        public static Place GetFromId(string id)
+        {
+            Place yelp = YelpService.GetPlace(id);
+            Place google = GooglePlacesService.GetPlace(id);
+            return yelp;
+        }
+
         public static List<string> GoogleImages(string placeName, string city)
         {
             List<string> urls = GoogleImageService.GoogleImages(placeName, city);

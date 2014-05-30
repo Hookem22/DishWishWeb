@@ -9,6 +9,9 @@
     <script src="Scripts/jquery-2.0.3.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
+    <script src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
+    <script src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
+
 <script type="text/javascript">
     var currentLat = 30.3077609;
     var currentLng = -97.7534014;

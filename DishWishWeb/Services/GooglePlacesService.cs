@@ -31,6 +31,41 @@ namespace DishWishWeb.Services
 
             string r = WebService.GetResponse(url);
 
+            return Deserialize(r, numberToReturn);
+        }
+
+        public static List<string> GoogleAutoComplete(string city)
+        {
+            city = city.Replace(" ", "%22");
+            string url = string.Format("https://maps.googleapis.com/maps/api/place/autocomplete/json?input={0}&types=(cities)&sensor=true&key=AIzaSyA1Viw-vy8_HSZmS02R9MBMoyNsYi5y2ME", city);
+
+            string r = WebService.GetResponse(url);
+
+            List<string> places = new List<string>();
+            while (r.Contains("\"description\" : \""))
+            {
+                r = r.Remove(0, r.IndexOf("\"description\" : \"") + 17);
+                places.Add(r.Substring(0, r.IndexOf("\",")));
+            }
+
+            return places;
+        }
+
+        public static Place GetPlace(string googleReferenceId)
+        {
+            string url = string.Format("https://maps.googleapis.com/maps/api/place/details/json?reference={0}&sensor=true&key=AIzaSyA1Viw-vy8_HSZmS02R9MBMoyNsYi5y2ME", googleReferenceId);
+
+            string r = WebService.GetResponse(url);
+
+            List<Place> place = Deserialize(r, 1);
+            if (place.Count > 0)
+                return place[0];
+
+            return new Place();
+        }
+
+        private static List<Place> Deserialize(string r, int numberToReturn)
+        {
             List<Place> places = new List<Place>();
             for (int i = 0; i < numberToReturn; i++)
             {
@@ -50,7 +85,7 @@ namespace DishWishWeb.Services
                     r = r.Remove(0, r.IndexOf("\"lat\" : ") + 8);
                     string lat = r.Substring(0, r.IndexOf(",")).Trim();
                     double d_lat;
-                    if(double.TryParse(lat, out d_lat))
+                    if (double.TryParse(lat, out d_lat))
                         place.Latitude = d_lat;
                 }
 
@@ -92,23 +127,6 @@ namespace DishWishWeb.Services
                 }
                 else
                     break;
-            }
-
-            return places;
-        }
-
-        public static List<string> GoogleAutoComplete(string city)
-        {
-            city = city.Replace(" ", "%22");
-            string url = string.Format("https://maps.googleapis.com/maps/api/place/autocomplete/json?input={0}&types=(cities)&sensor=true&key=AIzaSyA1Viw-vy8_HSZmS02R9MBMoyNsYi5y2ME", city);
-
-            string r = WebService.GetResponse(url);
-
-            List<string> places = new List<string>();
-            while (r.Contains("\"description\" : \""))
-            {
-                r = r.Remove(0, r.IndexOf("\"description\" : \"") + 17);
-                places.Add(r.Substring(0, r.IndexOf("\",")));
             }
 
             return places;

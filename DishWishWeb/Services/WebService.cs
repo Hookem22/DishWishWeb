@@ -21,13 +21,19 @@ namespace DishWishWeb.Services
             webRequest.Timeout = 20000;
             webRequest.Method = "GET";
 
-            var response = webRequest.GetResponse();
-            using (var stream = response.GetResponseStream())
+            try
             {
-                var reader = new StreamReader(stream);
-                var resp = reader.ReadToEnd();
-                return resp.ToString();
+                var response = webRequest.GetResponse();
+                using (var stream = response.GetResponseStream())
+                {
+                    var reader = new StreamReader(stream);
+                    var resp = reader.ReadToEnd();
+                    return resp.ToString();
+                }
             }
+            catch { }
+
+            return "";
         }
     }
 }

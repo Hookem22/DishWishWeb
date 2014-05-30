@@ -33,7 +33,11 @@ namespace DishWishWeb.Services
             var url = String.Format("http://api.yelp.com/v2/business/{0}", yelpId);
             string data = loadYelp(new Uri(url));
 
-            return Deserialize(data)[0];
+            List<Place> place = Deserialize(data);
+            if (place.Count > 0)
+                return place[0];
+
+            return new Place();
         }
 
         private static string loadYelp(Uri uri)
