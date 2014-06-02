@@ -10,8 +10,9 @@ namespace DishWishWeb.Services
 {
     public class ImageService
     {
-        const int fullImageWidth = 640;
-        const int fullImageHeight = 1136 - 200;
+        const int fullImageWidth = 640 / 2;
+        const int fullImageHeight = (1136 - 200) / 2;
+        const int menuImageWidth = fullImageWidth * 2;
 
         public string currentFile;
         string tempFile;
@@ -101,12 +102,12 @@ namespace DishWishWeb.Services
                     int newHeight = (int)d_newHeight;
                     int newWidth = fullImageWidth;
 
-                    if(newHeight > fullImageHeight)
-                    {
-                        newHeight = fullImageHeight;
-                        double d_newWidth = (double)original.Width * ratio;
-                        newWidth = (int)d_newWidth;
-                    }
+                    //if(newHeight > fullImageHeight)
+                    //{
+                    //    newHeight = fullImageHeight;
+                    //    double d_newWidth = (double)original.Width * ratio;
+                    //    newWidth = (int)d_newWidth;
+                    //}
 
                     using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(newWidth, newHeight))
                     {
@@ -130,7 +131,7 @@ namespace DishWishWeb.Services
             {
                 using (System.Drawing.Image original = System.Drawing.Image.FromFile(currentFile))
                 {
-                    double ratio = 640.0 / (double)original.Width;
+                    double ratio = fullImageWidth / (double)original.Width;
                     double d_newHeight = (double)original.Height * ratio;
                     int newHeight = (int)d_newHeight;
                     double d_yOffset = (fullImageHeight - d_newHeight) / 2;
@@ -211,11 +212,10 @@ namespace DishWishWeb.Services
             {
                 using (System.Drawing.Image original = System.Drawing.Image.FromFile(currentFile))
                 {
-
-                    double ratio = (double)fullImageWidth / (double)original.Width;
+                    double ratio = (double)menuImageWidth / (double)original.Width;
                     double d_newHeight = (double)original.Height * ratio;
                     int newHeight = (int)d_newHeight;
-                    int newWidth = fullImageWidth;
+                    int newWidth = menuImageWidth;
 
                     using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(newWidth, newHeight))
                     {
@@ -239,7 +239,8 @@ namespace DishWishWeb.Services
             {
                 using (System.Drawing.Image original = System.Drawing.Image.FromFile(currentFile))
                 {
-                    using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(fullImageWidth, fullImageHeight + 100))
+                    int ht = original.Height < fullImageHeight + 100 ? fullImageHeight + 100 : original.Height;
+                    using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(menuImageWidth, ht))
                     {
                         using (System.Drawing.Graphics gr = System.Drawing.Graphics.FromImage(newPic))
                         {
