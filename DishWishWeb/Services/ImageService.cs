@@ -13,6 +13,7 @@ namespace DishWishWeb.Services
         const int fullImageWidth = 640 / 2;
         const int fullImageHeight = (1136 - 200) / 2;
         const int menuImageWidth = fullImageWidth * 2;
+        const int menuImageHeight = 1136 - 100;
 
         public string currentFile;
         string tempFile;
@@ -239,7 +240,7 @@ namespace DishWishWeb.Services
             {
                 using (System.Drawing.Image original = System.Drawing.Image.FromFile(currentFile))
                 {
-                    int ht = original.Height < fullImageHeight + 100 ? fullImageHeight + 100 : original.Height;
+                    int ht = original.Height < menuImageHeight ? menuImageHeight : original.Height;
                     using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(menuImageWidth, ht))
                     {
                         using (System.Drawing.Graphics gr = System.Drawing.Graphics.FromImage(newPic))
