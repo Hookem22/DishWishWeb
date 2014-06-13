@@ -71,6 +71,7 @@ namespace DishWishWeb.Services
             SetCurrentImage();
             ScaleMenuImage();
             SetCurrentImage();
+            ToJpg();
         }
 
         public void Download(string url)
@@ -79,6 +80,24 @@ namespace DishWishWeb.Services
             using (WebClient client = new WebClient())
             {
                 client.DownloadFile(url, currentFile);
+            }
+        }
+
+        public void ToJpg()
+        {
+            try
+            {
+                using (System.Drawing.Image img = System.Drawing.Image.FromFile(currentFile))
+                {
+                    img.Save(tempFile, System.Drawing.Imaging.ImageFormat.Jpeg);
+                }
+
+                SetCurrentImage();
+
+            }
+            catch (Exception ex)
+            {
+                string desc = ex.ToString();
             }
         }
 
@@ -241,15 +260,22 @@ namespace DishWishWeb.Services
                 using (System.Drawing.Image original = System.Drawing.Image.FromFile(currentFile))
                 {
                     int ht = original.Height < menuImageHeight ? menuImageHeight : original.Height;
-                    using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(menuImageWidth, ht))
+                    using (Bitmap originalBitmap = new Bitmap(original))
                     {
-                        using (System.Drawing.Graphics gr = System.Drawing.Graphics.FromImage(newPic))
+                        using (System.Drawing.Bitmap newPic = new System.Drawing.Bitmap(menuImageWidth, ht))
                         {
-                            gr.Clear(Color.White);
+                            using (System.Drawing.Graphics gr = System.Drawing.Graphics.FromImage(newPic))
+                            {
+                                Color color = originalBitmap.GetPixel(originalBitmap.Width / 2, originalBitmap.Height - 5);
+                                if (color == null)
+                                    color = Color.White;
 
-                            gr.DrawImage(original, new Point(0, 0));
+                                gr.Clear(color);
 
-                            newPic.Save(tempFile, System.Drawing.Imaging.ImageFormat.Png);
+                                gr.DrawImage(original, new Point(0, 0));
+
+                                newPic.Save(tempFile, System.Drawing.Imaging.ImageFormat.Png);
+                            }
                         }
                     }
                 }
@@ -259,6 +285,7 @@ namespace DishWishWeb.Services
                 string desc = ex.ToString();
             }
         }
+
 
         private void SetCurrentImage()
         {

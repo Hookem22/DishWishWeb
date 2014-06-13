@@ -115,7 +115,7 @@
 
             var urls = [];
             for(var i = 0; i < place.ImageCount; i++) {
-                urls.push(container + i + ".png");
+                urls.push(container + i + ".jpg");
             }
 
             DownloadImages(urls);
@@ -352,7 +352,7 @@
                 var list = "<ul>";
                 for (var i = 0, ii = data.d.ImageCount; i < ii; i++) {
                     var wd = imgWidth / 2;
-                    list += '<li><img src="' + container + i + '.png" style="width: ' + wd + 'px;" /></li>';                  
+                    list += '<li><img src="' + container + i + '.jpg" style="width: ' + wd + 'px;" /></li>';                  
                 }
                 list += "</ul>";
                 $("#imagesDiv").html(list);
