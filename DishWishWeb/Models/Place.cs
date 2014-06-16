@@ -224,5 +224,52 @@ namespace DishWishWeb.Models
                 }
             }
         }
+
+        public List<string> GetImageSizes()
+        {
+            List<string> sizes = new List<string>();
+            BlobService blob = new BlobService("places");
+            for(int i = 0, ii = ImageCount; i < ii; i++)
+            {
+                sizes.Add(blob.GetBlobSize(string.Format("{0}_{1}.jpg", Id, i)));
+            }
+
+            GetMenuImageSize(Menu, sizes);
+            GetMenuImageSize(LunchMenu, sizes);
+            GetMenuImageSize(BrunchMenu, sizes);
+            GetMenuImageSize(DrinkMenu, sizes);
+            GetMenuImageSize(HappyHourMenu, sizes);
+            
+            return sizes;
+        }
+
+        static void GetMenuImageSize(string menuName, List<string> sizes)
+        {
+            BlobService blob = new BlobService("places");
+            if (menuName.Contains("dishwishes"))
+            {
+                if (menuName.Contains("/"))
+                    menuName = menuName.Substring(menuName.LastIndexOf("/") + 1);
+
+                sizes.Add(blob.GetBlobSize(menuName));
+            }
+        }
+
+        public static void DeleteAll()
+        {
+            BlobService blobService = new BlobService("places");
+
+            List<string> blobs = blobService.GetAllBlobs();
+            foreach(string blob in blobs)
+            {
+                blobService.DeleteBlob(blob);
+            }
+
+            List<Place> places = Place.Get();
+            foreach(Place place in places)
+            {
+                place.Delete();
+            }
+        }
     }
 }

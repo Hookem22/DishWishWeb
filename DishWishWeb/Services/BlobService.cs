@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
@@ -63,6 +64,46 @@ namespace DishWishWeb.Services
                 blockBlob.Delete();
             }
             catch { }
+        }
+
+        public List<string> GetAllBlobs()
+        {
+            // Create the blob client.
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+            // Retrieve reference to a previously created container.
+            CloudBlobContainer container = blobClient.GetContainerReference(_containerName);
+
+            IEnumerable<IListBlobItem> blobs = container.ListBlobs();
+            List<string> blobList = new List<string>();
+            foreach(IListBlobItem blob in blobs)
+            {
+                blobList.Add(blob.Uri.Segments[blob.Uri.Segments.Length - 1]);
+            }
+
+            return blobList;
+        }
+
+        public string GetBlobSize(string blobName)
+        {
+            // Create the blob client.
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+            // Retrieve reference to a previously created container.
+            CloudBlobContainer container = blobClient.GetContainerReference(_containerName);
+
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
+            blockBlob.FetchAttributes();
+
+            long size = blockBlob.Properties.Length;
+
+            //String conversion
+            string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+            int mag = (int)Math.Log(size, 1024);
+            decimal adjustedSize = (decimal)size / (1L << (mag * 10));
+
+            return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
+
         }
 
         public void ClearTmpBlobs()

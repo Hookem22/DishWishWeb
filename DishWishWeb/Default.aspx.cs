@@ -59,9 +59,23 @@ namespace DishWishWeb
         }
 
         [WebMethod]
+        public static List<string> GetImageSizes(Place place)
+        {
+            return place.GetImageSizes();
+        }
+
+        [WebMethod]
         public static List<string> CityAutoComplete(string city)
         {
             return Place.GoogleAutoComplete(city);
+        }
+
+        private static void DeleteAll()
+        {
+            //careful
+            return;
+
+            Place.DeleteAll();
         }
     }
 }

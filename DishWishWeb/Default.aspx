@@ -342,20 +342,41 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data) {
-                $(".search .fbLoading").hide();
 
                 SetPlace(data.d);
 
                 $("#Id").val(data.d.Id);
 
-                var container = "http://dishwishes.blob.core.windows.net/places/" + data.d.Id + "_";
-                var list = "<ul>";
-                for (var i = 0, ii = data.d.ImageCount; i < ii; i++) {
-                    var wd = imgWidth / 2;
-                    list += '<li><img src="' + container + i + '.jpg" style="width: ' + wd + 'px;" /></li>';                  
-                }
-                list += "</ul>";
-                $("#imagesDiv").html(list);
+                var id = data.d.Id;
+                var imageCount = data.d.ImageCount;
+
+                $.ajax({
+                    type: "POST",
+                    url: "Default.aspx/GetImageSizes",
+                    data: "{place:" + JSON.stringify(data.d) + "}",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (sizes) {
+                        $(".search .fbLoading").hide();
+
+                        var container = "http://dishwishes.blob.core.windows.net/places/" + id + "_";
+                        var list = "<ul>";
+                        var wd = imgWidth / 2;
+
+                        for (var i = 0; i < imageCount; i++) {
+                            list += '<li><img src="' + container + i + '.jpg" style="width: ' + wd + 'px;" /><br/>Size: ' + sizes.d[i] + '</li>';
+                        }
+
+                        list += '<li>'
+                        for (var i = imageCount; i < sizes.d.length; i++)
+                        {
+                            list += "Menu size: " + sizes.d[i] + "<br/>";
+                        }
+
+                        list += "</ul>";
+                        $("#imagesDiv").html(list);
+                    }
+                });
             }
         });
     }
