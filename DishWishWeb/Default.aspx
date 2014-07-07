@@ -477,6 +477,8 @@
             position: myLatLng,
             map: map
         });
+
+        $("#map-canvas").css("overflow", "inherit");
     }
 
     $(document).keyup(function (e) {
