@@ -458,6 +458,25 @@
         $("#LunchMenu").val(place.LunchMenu);
         $("#DrinkMenu").val(place.DrinkMenu);
         $("#HappyHourMenu").val(place.HappyHourMenu);
+
+        PlotMap(place.Latitude, place.Longitude);
+    }
+
+    function PlotMap(lat, lng) {
+        var myLatLng = new google.maps.LatLng(lat, lng);
+
+        var mapOptions = {
+            zoom: 15,
+            center: new google.maps.LatLng(lat, lng),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+        var marker = new google.maps.Marker({
+            position: myLatLng,
+            map: map
+        });
     }
 
     $(document).keyup(function (e) {
@@ -492,6 +511,7 @@
             <input id="GoogleReferenceId" type="text" PlaceHolder="GoogleReferenceId" /><br />
             <input id="YelpId" type="text" PlaceHolder="YelpId" /><br />
             <input id="Website" type="text" PlaceHolder="Website" /><a id="WebsiteLink" target="_blank" class="arrowLink"></a><br />
+            <div id="map-canvas" style="left: 500px;top: 10px;height: 180px;width: 300px;position:absolute;"></div>
             <input id="Menu" type="text" style="width:200px;" PlaceHolder="Menu" /><a class="arrowLink menuArrow" title="Menu"></a>
             <input id="LunchMenu" type="text" style="width:200px;" PlaceHolder="Lunch Menu" /><a class="arrowLink menuArrow" title="LunchMenu"></a>
             <input id="BrunchMenu" type="text" style="width:200px;" PlaceHolder="Brunch Menu" /><a class="arrowLink menuArrow" title="BrunchMenu"></a>
