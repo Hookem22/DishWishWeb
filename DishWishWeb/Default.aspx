@@ -196,6 +196,9 @@
 
         $("#PopupOverlay").show();
         $("#Popup").show();
+
+        setTimeout(function () { $("#map-canvas").css("overflow", "inherit"); }, 5000);
+
     }
 
     function togglePickedImage(img) {
@@ -477,8 +480,6 @@
             position: myLatLng,
             map: map
         });
-
-        $("#map-canvas").css("overflow", "inherit");
     }
 
     $(document).keyup(function (e) {
