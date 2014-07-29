@@ -79,7 +79,11 @@ namespace DishWishWeb.Models
 
             places.AddRange(yelpPlaces);
 
-            places.AddRange(Place.GetByName(placeName, latitude, longitude));
+            try
+            {
+                places.AddRange(Place.GetByName(placeName, latitude, longitude));
+            }
+            catch (Exception ex) { }
 
             return places;
         }

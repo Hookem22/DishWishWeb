@@ -232,7 +232,7 @@
                 var ct = $("#imagesDiv li").length;
                 $(data.d).each(function (i) {
                     var j = ct + i;
-                    list += '<li><input type="text" style="width:50px;" value="' + j + '" /><a onclick="DeleteImage(' + j + ')" style="margin-left:6px;" >Delete</a><br/><img src="' + this + '" style="width: ' + imgWidth + 'px;" /></li>';
+                    list += '<li><input type="text" style="width:50px;" value="' + j + '" /><a onclick="DeleteImage(' + j + ')" style="margin-left:6px;" >Delete</a><br/><img src="' + this + "?" + new Date().getTime() + '" style="width: ' + imgWidth + 'px;" /></li>';
                 });
 
                 $("#imagesDiv").append(list);
@@ -255,6 +255,9 @@
             var percentCrop = x / imgWidth;
 
             var src = $(this).attr("src");
+            if (src.indexOf("?") >= 0)
+                src = src.substr(0, src.indexOf("?"));
+
             var id = src.substr(src.lastIndexOf("_") + 1);
             if (id.indexOf(".png") >= 0)
                 id = id.substr(0, id.indexOf(".png"));
@@ -268,7 +271,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
-                    $("#imagesDiv img:eq(" + id + ")").attr("src", src);// + "?" + new Date().getTime());
+                    $("#imagesDiv img:eq(" + id + ")").attr("src", src + "?" + new Date().getTime());
                     cropping = false;
                 }
             });
@@ -292,8 +295,13 @@
 
         var urls = [];
         $("#imagesDiv img").each(function (i) {
-            if(id != i)
+            if (id != i) {
+                var src = $(this).attr("src");
+                if (src.indexOf("?") >= 0)
+                    src = src.substr(0, src.indexOf("?"));
+
                 urls.push($(this).attr("src"));
+            }
         });
 
         $("#imagesDiv").html("");
