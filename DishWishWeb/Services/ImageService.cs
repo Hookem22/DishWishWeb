@@ -18,9 +18,12 @@ namespace DishWishWeb.Services
         public string currentFile;
         string tempFile;
 
-        public ImageService()
+        public ImageService(bool isPdf = false)
         {
-            currentFile = Path.Combine(tempFolder, "current.png");
+            if(isPdf)
+                currentFile = Path.Combine(tempFolder, "current.pdf");
+            else
+                currentFile = Path.Combine(tempFolder, "current.png");
             tempFile = Path.Combine(tempFolder, "tmp.png");
         }
 
@@ -66,7 +69,10 @@ namespace DishWishWeb.Services
 
         public void SaveMenu(string url)
         {
-            Download(GetMenuImageFromAwesomeScreenshot(url));
+            if (url.Contains("awesomescreenshot.com"))
+                url = GetMenuImageFromAwesomeScreenshot(url);
+
+            Download(url);
             ResizeImageForWidth();
             SetCurrentImage();
             ScaleMenuImage();
@@ -77,6 +83,7 @@ namespace DishWishWeb.Services
         public void Download(string url)
         {
             Delete(currentFile);
+
             using (WebClient client = new WebClient())
             {
                 client.DownloadFile(url, currentFile);

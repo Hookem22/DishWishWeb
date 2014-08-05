@@ -22,7 +22,7 @@ namespace DishWishWeb.Services
         }
 
 
-        public void CreateBlob(string blobName)
+        public void CreateBlob(string blobName, string currentFile)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace DishWishWeb.Services
                 CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
 
                 // Create or overwrite the "myblob" blob with contents from a local file.
-                using (var fileStream = System.IO.File.OpenRead(new ImageService().currentFile))
+                using (var fileStream = System.IO.File.OpenRead(currentFile))
                 {
                     blockBlob.UploadFromStream(fileStream);
                 }

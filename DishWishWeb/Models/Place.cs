@@ -134,7 +134,7 @@ namespace DishWishWeb.Models
 
                 string tmpUrl = "tmp_" + i.ToString() + ".png";
                 service.SaveTmpImage(urls[i]);
-                blob.CreateBlob(tmpUrl);
+                blob.CreateBlob(tmpUrl, service.currentFile);
                 blobUrls.Add(blob.container + tmpUrl);
             }
 
@@ -150,7 +150,7 @@ namespace DishWishWeb.Models
             service.Download(string.Format("{0}tmp_{1}.png", blob.container, id));
             service.Crop(percentCrop);
 
-            blob.CreateBlob(string.Format("tmp_{0}.png", id));
+            blob.CreateBlob(string.Format("tmp_{0}.png", id), service.currentFile);
         }
 
         public void Save(List<int> sortOrder)
@@ -168,49 +168,52 @@ namespace DishWishWeb.Models
 
         private void SaveMenus()
         {
-            BlobService blob = new BlobService("places");
-            ImageService service = new ImageService();
+            if (!string.IsNullOrEmpty(Menu))
+            {
+                Menu = SaveMenu(Menu, "Menu");
+            }
+            if (!string.IsNullOrEmpty(LunchMenu))
+            {
+                LunchMenu = SaveMenu(LunchMenu, "LunchMenu");
+            }
+            if (!string.IsNullOrEmpty(BrunchMenu))
+            {
+                BrunchMenu = SaveMenu(BrunchMenu, "BrunchMenu");
+            }
+            if (!string.IsNullOrEmpty(DrinkMenu))
+            {
+                DrinkMenu = SaveMenu(DrinkMenu, "DrinkMenu");
+            }
+            if (!string.IsNullOrEmpty(HappyHourMenu))
+            {
+                HappyHourMenu = SaveMenu(HappyHourMenu, "HappyHourMenu");
+            }
+        }
+
+        private string SaveMenu(string menu, string name)
+        {
+            if (menu.Contains("dishwishes.blob"))
+                return menu;
             
-            if (!string.IsNullOrEmpty(Menu) && Menu.Contains("awesomescreenshot.com"))
-            {
-                service.SaveMenu(Menu);
+            BlobService blob = new BlobService("places");
+            ImageService service;
+            string blobName = "";
 
-                string blobName = string.Format("{0}_{1}.jpg", Id, "Menu");
-                blob.CreateBlob(blobName);
-                Menu = string.Format("{0}{1}", blob.container, blobName);
-            }
-            if (!string.IsNullOrEmpty(LunchMenu) && LunchMenu.Contains("awesomescreenshot.com"))
+            if (menu.Contains(".pdf"))
             {
-                service.SaveMenu(LunchMenu);
-
-                string blobName = string.Format("{0}_{1}.jpg", Id, "LunchMenu");
-                blob.CreateBlob(blobName);
-                LunchMenu = string.Format("{0}{1}", blob.container, blobName);
+                service = new ImageService(true); 
+                service.Download(menu);
+                blobName = string.Format("{0}_{1}.pdf", Id, name);
             }
-            if (!string.IsNullOrEmpty(BrunchMenu) && BrunchMenu.Contains("awesomescreenshot.com"))
+            else
             {
-                service.SaveMenu(BrunchMenu);
-
-                string blobName = string.Format("{0}_{1}.jpg", Id, "BrunchMenu");
-                blob.CreateBlob(blobName);
-                BrunchMenu = string.Format("{0}{1}", blob.container, blobName);
+                service = new ImageService();                
+                service.SaveMenu(menu);
+                blobName = string.Format("{0}_{1}.jpg", Id, name);
             }
-            if (!string.IsNullOrEmpty(DrinkMenu) && DrinkMenu.Contains("awesomescreenshot.com"))
-            {
-                service.SaveMenu(DrinkMenu);
-
-                string blobName = string.Format("{0}_{1}.jpg", Id, "DrinkMenu");
-                blob.CreateBlob(blobName);
-                DrinkMenu = string.Format("{0}{1}", blob.container, blobName);
-            }
-            if (!string.IsNullOrEmpty(HappyHourMenu) && HappyHourMenu.Contains("awesomescreenshot.com"))
-            {
-                service.SaveMenu(HappyHourMenu);
-
-                string blobName = string.Format("{0}_{1}.jpg", Id, "HappyHourMenu");
-                blob.CreateBlob(blobName);
-                HappyHourMenu = string.Format("{0}{1}", blob.container, blobName);
-            }
+           
+            blob.CreateBlob(blobName, service.currentFile);
+            return string.Format("{0}{1}", blob.container, blobName);
         }
 
         private void SaveImages(List<int> sortOrder)
@@ -224,7 +227,7 @@ namespace DishWishWeb.Models
                 {
                     service.Download(string.Format("{0}{1}", blob.container, tmpBlobName));
                     service.ToJpg();
-                    blob.CreateBlob(string.Format("{0}_{1}.jpg", Id, sortOrder[i].ToString()));
+                    blob.CreateBlob(string.Format("{0}_{1}.jpg", Id, sortOrder[i].ToString()), service.currentFile);
                 }
             }
         }
